@@ -1,5 +1,5 @@
 /* RECOMP service worker — offline app shell + runtime cache */
-const CACHE = 'recomp-v6';
+const CACHE = 'recomp-v8';
 const ASSETS = [
   './',
   './index.html',
