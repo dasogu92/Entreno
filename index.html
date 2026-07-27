@@ -118,6 +118,16 @@
   .bstat .bn{font-family:'Archivo';font-weight:800;font-size:19px;line-height:1;color:var(--sky);}
   .bstat .bl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-top:5px;font-weight:600;}
 
+  /* lista de la compra */
+  .shopseg{margin-bottom:14px;}
+  .shopseg button{padding:9px;font-size:12.5px;}
+  .shopseg button.on{border-color:var(--sky);}
+  .ing.shop{cursor:pointer;padding:7px 13px;font-size:12.5px;transition:.12s;user-select:none;}
+  .ing.shop:active{transform:scale(.95);}
+  .ing.shop.got{background:var(--done-soft);border-color:var(--done);color:var(--done);text-decoration:line-through;text-decoration-color:rgba(194,230,37,.6);}
+  .shop-foot{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:15px;padding-top:13px;border-top:1px solid var(--line);}
+  .shop-foot span{font-size:11.5px;color:var(--muted);}
+
   /* copia de seguridad */
   .backup-row{display:flex;gap:9px;margin-top:14px;}
   .btn-sec{flex:1;background:var(--panel2);border:1px solid var(--line2);color:var(--text);font-weight:700;font-size:13px;padding:12px;border-radius:11px;}
@@ -202,8 +212,10 @@
   .p-phase{font-family:'Archivo';font-weight:800;font-size:13px;letter-spacing:.18em;text-transform:uppercase;color:var(--effort);text-align:center;margin-top:2px;}
   .player.rest .p-phase{color:var(--done);}
   .p-mid{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;}
+  #pActive{display:flex;flex-direction:column;align-items:center;width:100%;}
   .p-ex{font-family:'Archivo';font-weight:800;font-size:30px;line-height:1.05;margin-bottom:20px;max-width:340px;}
-  .p-ring{position:relative;width:250px;height:250px;}
+  .p-ring{position:relative;width:250px;height:250px;max-width:78vw;max-height:78vw;margin:0 auto;flex-shrink:0;}
+  .p-ring svg{width:100%;height:100%;display:block;}
   .p-ring svg{transform:rotate(-90deg);}
   .p-ring .c{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
   .p-time{font-family:'JetBrains Mono';font-weight:800;font-size:62px;line-height:1;letter-spacing:-.02em;}
@@ -271,11 +283,19 @@
         <div id="mealList"></div>
         <p class="note" id="mealNote">Marca cada comida al terminarla. Las cantidades ajústalas a tu apetito.</p>
       </div>
-      <div class="card" id="shopCard" style="display:none;">
+      <div class="card" id="shopCard">
         <div class="eyebrow sky"><span class="dot"></span><span>Lista de la compra</span></div>
-        <h2>Para dejarlo listo</h2>
-        <p class="lede">Todo lo que necesitas mañana, sin repetir.</p>
+        <h2 id="shopTitle">Lo que necesitas</h2>
+        <p class="lede" id="shopLede">Toca un ingrediente para tacharlo.</p>
+        <div class="dayseg shopseg" id="shopSeg">
+          <button data-r="day" class="on">Este día</button>
+          <button data-r="week">7 días</button>
+        </div>
         <div class="ingredients" id="shopList" style="margin-left:0;"></div>
+        <div class="shop-foot">
+          <span id="shopCount" class="mono"></span>
+          <button class="btn-sec" id="shopClear" style="flex:0 0 auto;padding:8px 14px;font-size:12px;">Desmarcar todo</button>
+        </div>
       </div>
     </section>
 
@@ -654,7 +674,7 @@
   async function load(){ try{const raw=await readStore(); if(raw) S=JSON.parse(raw);}catch(e){}
     if(!S.profile) S.profile={weight:null,height:null,age:null,sex:'m',goal:'recomp',intens:'normal'};
     if(!S.profile.sex) S.profile.sex='m'; if(!S.profile.intens) S.profile.intens='normal';
-    if(!S.days) S.days={}; }
+    if(!S.days) S.days={}; if(!Array.isArray(S.shop)) S.shop=[]; }
   let st=null; function save(){ clearTimeout(st); st=setTimeout(()=>{ writeStore(JSON.stringify(S)); },120); }
 
   function bmr(){ const p=S.profile; if(!p.weight||!p.height||!p.age) return null;
@@ -785,12 +805,52 @@
         '<div class="body"><div class="tag">'+names[i]+'</div><div class="meal-name">'+meal.n+'</div></div></div><div class="ingredients">'+chips+'</div>';
       if(!isT) card.querySelector('.chk').addEventListener('click',()=>{rec.meals[i]=!rec.meals[i];save();renderComida();});
       ml.appendChild(card); });
-    // lista de la compra sin repetidos (solo en vista de mañana)
-    const shop=document.getElementById('shopCard');
-    if(isT){ shop.style.display='block';
-      const all=[]; keys.forEach(k=>m[k].ing.forEach(x=>{ if(!all.some(y=>y.toLowerCase()===x.toLowerCase())) all.push(x); }));
-      document.getElementById('shopList').innerHTML=all.map(x=>'<span class="ing">'+x+'</span>').join('');
-    } else shop.style.display='none';
+    renderShop();
+  }
+  /* ===== LISTA DE LA COMPRA ===== */
+  let shopRange='day';
+  // unifica variantes del mismo producto para no duplicar la compra
+  const SHOP_ALIAS={'aceite de oliva':'Aceite','aceite':'Aceite','atún al natural':'Atún','atún':'Atún',
+    'fruta de temporada':'Fruta','fruta':'Fruta','almendras o nueces':'Nueces','nueces':'Nueces',
+    'pan integral':'Pan','pan':'Pan','queso batido':'Queso fresco batido','queso fresco batido':'Queso fresco batido',
+    'copos de avena':'Avena','tomate rallado':'Tomate','tomate':'Tomate','verduras variadas':'Verduras',
+    'jamón serrano':'Jamón','jamón':'Jamón','pavo en lonchas':'Pavo','pavo':'Pavo','filetes de pavo':'Pavo',
+    'huevo':'Huevos','huevos':'Huevos','garbanzos cocidos':'Garbanzos','garbanzos':'Garbanzos',
+    'pechuga de pollo':'Pollo','pollo':'Pollo','yogur natural':'Yogur','yogur':'Yogur'};
+  function norm(x){ return SHOP_ALIAS[x.toLowerCase().trim()] || x; }
+  function shopIngredients(){
+    const out=[];
+    const add=arr=>arr.forEach(raw=>{ const x=norm(raw); if(!out.some(y=>y.toLowerCase()===x.toLowerCase())) out.push(x); });
+    const keys=['des','com','mer','cen'];
+    if(shopRange==='week'){
+      const base=new Date(mKey()+'T00:00:00');
+      for(let i=0;i<7;i++){ const d=new Date(base); d.setDate(d.getDate()+i);
+        const mm=MEALS[d.getDay()]; keys.forEach(k=>add(mm[k].ing)); }
+    } else {
+      const mm=MEALS[new Date(mKey()+'T00:00:00').getDay()]; keys.forEach(k=>add(mm[k].ing));
+    }
+    return out.sort((a,b)=>a.localeCompare(b,'es'));
+  }
+  function renderShop(){
+    if(!S.shop) S.shop=[];
+    const items=shopIngredients(), isT=(mSel==='tomorrow');
+    document.querySelectorAll('#shopSeg button').forEach(b=>b.classList.toggle('on',b.dataset.r===shopRange));
+    document.getElementById('shopTitle').textContent = shopRange==='week' ? 'Compra de la semana' : (isT?'Compra para mañana':'Compra de hoy');
+    const done=items.filter(x=>S.shop.includes(x.toLowerCase())).length;
+    document.getElementById('shopLede').textContent='Toca un ingrediente para tacharlo cuando lo tengas.';
+    document.getElementById('shopCount').textContent=done+' / '+items.length+' conseguidos';
+    const box=document.getElementById('shopList'); box.innerHTML='';
+    items.forEach(x=>{
+      const on=S.shop.includes(x.toLowerCase());
+      const el=document.createElement('span'); el.className='ing shop'+(on?' got':'');
+      el.textContent=x;
+      el.addEventListener('click',()=>{
+        const k=x.toLowerCase();
+        if(S.shop.includes(k)) S.shop=S.shop.filter(y=>y!==k); else S.shop.push(k);
+        save(); renderShop();
+      });
+      box.appendChild(el);
+    });
   }
 
 
@@ -1075,6 +1135,8 @@
     document.querySelectorAll(sel+' button').forEach(x=>x.classList.remove('on')); b.classList.add('on'); })); });
   document.querySelectorAll('#wSeg button').forEach(b=>b.addEventListener('click',()=>{ wSel=b.dataset.w; renderEntreno(); }));
   document.querySelectorAll('#mSeg button').forEach(b=>b.addEventListener('click',()=>{ mSel=b.dataset.m; renderComida(); }));
+  document.querySelectorAll('#shopSeg button').forEach(b=>b.addEventListener('click',()=>{ shopRange=b.dataset.r; renderShop(); }));
+  document.getElementById('shopClear').addEventListener('click',()=>{ S.shop=[]; save(); renderShop(); toast('Lista reiniciada'); });
   document.getElementById('saveProfile').addEventListener('click',()=>{ const wv=parseFloat(document.getElementById('pWeight').value),hv=parseFloat(document.getElementById('pHeight').value),av=parseInt(document.getElementById('pAge').value);
     S.profile.weight=isNaN(wv)?null:wv; S.profile.height=isNaN(hv)?null:hv; S.profile.age=isNaN(av)?null:av;
     S.profile.goal=document.querySelector('#pGoal button.on').dataset.g;
