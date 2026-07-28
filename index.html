@@ -159,6 +159,23 @@
   .shop-foot{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:15px;padding-top:13px;border-top:1px solid var(--line);}
   .shop-foot span{font-size:11.5px;color:var(--muted);}
 
+  /* cambiar comida */
+  .meal-head{display:flex;align-items:flex-start;gap:14px;}
+  .swapbtn{margin-left:auto;flex-shrink:0;width:34px;height:34px;border-radius:10px;border:1px solid var(--line2);
+    background:var(--panel2);color:var(--muted);display:flex;align-items:center;justify-content:center;}
+  .swapbtn svg{width:15px;height:15px;}
+  .swapbtn:active{transform:scale(.92);background:var(--sky);color:var(--ink);border-color:var(--sky);}
+  .swapped{font-size:8.5px;background:rgba(72,201,230,.15);color:var(--sky);padding:2px 6px;border-radius:99px;letter-spacing:.04em;margin-left:5px;}
+  .swapopt{display:block;width:100%;text-align:left;background:var(--panel2);border:1px solid var(--line);
+    border-radius:12px;padding:13px 15px;margin-bottom:9px;color:var(--text);}
+  .swapopt:active{transform:scale(.98);}
+  .swapopt.sel{border-color:var(--done);background:var(--done-soft);}
+  .so-top{display:flex;align-items:center;gap:8px;}
+  .so-n{font-weight:600;font-size:14px;line-height:1.25;flex:1;}
+  .swapopt.sel .so-n{color:var(--done);}
+  .so-def{font-size:8.5px;background:var(--panel3);color:var(--muted);padding:2px 7px;border-radius:99px;letter-spacing:.05em;text-transform:uppercase;flex-shrink:0;}
+  .so-ing{font-size:11px;color:var(--muted2);margin-top:5px;line-height:1.4;}
+
   /* cargas por ejercicio */
   .exload{margin-top:5px;}
   .loadbtn{background:var(--panel2);border:1px dashed var(--line2);color:var(--muted);
@@ -502,6 +519,15 @@
     <button class="save-profile" id="loadSave">Guardar carga</button>
     <button class="danger" id="loadClose">Cancelar</button>
   </div>
+  <div class="sheet-bg" id="swapBg"></div>
+  <div class="sheet" id="swapSheet">
+    <div class="grab"></div>
+    <h3 id="swapTitle">Elegir comida</h3>
+    <p class="lede" id="swapLede" style="margin-top:-10px;">Toca la que prefieras.</p>
+    <div id="swapList"></div>
+    <button class="btn-sec" id="swapReset" style="width:100%;margin-top:6px;">Volver a la del menú</button>
+    <button class="danger" id="swapClose">Cerrar</button>
+  </div>
   <div class="toast" id="toast">Guardado</div>
 </div>
 
@@ -690,36 +716,83 @@
   function wkToday(){ return wkOf(todayKey()); }
 
   /* ===== MEALS con ingredientes ===== */
-  const MEALS=[
-    {des:{n:'Tostadas con tomate, aceite y jamón + café',ing:['Pan','Tomate rallado','Aceite de oliva','Jamón serrano','Café']},
-     com:{n:'Lentejas con verduras y huevo cocido',ing:['Lentejas','Zanahoria','Cebolla','Pimiento','Huevo','Laurel']},
-     mer:{n:'Yogur natural con nueces y plátano',ing:['Yogur natural','Nueces','Plátano']},
-     cen:{n:'Merluza a la plancha con patata y ensalada',ing:['Merluza','Patata','Lechuga','Tomate','Aceite']}},
-    {des:{n:'Yogur con avena, fruta y miel',ing:['Yogur','Copos de avena','Fruta de temporada','Miel']},
-     com:{n:'Pechuga de pollo con arroz y verduras',ing:['Pechuga de pollo','Arroz','Calabacín','Pimiento','Cebolla']},
-     mer:{n:'Tosta con queso fresco y pavo',ing:['Pan integral','Queso fresco','Pavo en lonchas']},
-     cen:{n:'Tortilla francesa de 3 huevos con ensalada',ing:['Huevos','Aceite','Lechuga','Tomate','Cebolla']}},
-    {des:{n:'Tostada de aguacate y huevo',ing:['Pan','Aguacate','Huevo','Sal','Aceite']},
-     com:{n:'Garbanzos con espinacas y bacalao',ing:['Garbanzos','Espinacas','Bacalao desalado','Ajo','Tomate']},
-     mer:{n:'Queso batido con fruta',ing:['Queso batido','Fruta','Canela']},
-     cen:{n:'Pavo a la plancha con verduras al horno',ing:['Filetes de pavo','Calabacín','Berenjena','Pimiento','Aceite']}},
-    {des:{n:'Café con leche y tostada integral con pavo',ing:['Leche','Café','Pan integral','Pavo']},
-     com:{n:'Pasta integral con atún y tomate',ing:['Pasta integral','Atún al natural','Tomate','Aceitunas']},
-     mer:{n:'Fruta con puñado de frutos secos',ing:['Fruta','Almendras o nueces']},
-     cen:{n:'Salmón al horno con brócoli',ing:['Salmón','Brócoli','Limón','Aceite']}},
-    {des:{n:'Tostadas con tomate y jamón + fruta',ing:['Pan','Tomate','Jamón','Fruta']},
-     com:{n:'Arroz con pollo y verduras',ing:['Arroz','Pollo','Guisantes','Zanahoria','Pimiento']},
-     mer:{n:'Yogur griego con miel y nueces',ing:['Yogur griego','Miel','Nueces']},
-     cen:{n:'Ensalada de garbanzos con atún',ing:['Garbanzos cocidos','Atún','Tomate','Cebolla','Huevo']}},
-    {des:{n:'Huevos revueltos con pan integral',ing:['Huevos','Pan integral','Aceite','Sal']},
-     com:{n:'Pisto con huevo y pan',ing:['Calabacín','Pimiento','Tomate','Cebolla','Huevo','Pan']},
-     mer:{n:'Queso fresco batido con fruta',ing:['Queso batido','Fruta']},
-     cen:{n:'Pechuga a la plancha con patata asada',ing:['Pechuga de pollo','Patata','Aceite','Romero']}},
-    {des:{n:'Tostada con queso fresco y tomate',ing:['Pan','Queso fresco','Tomate','Aceite']},
-     com:{n:'Arroz con verduras y pollo',ing:['Arroz','Pollo','Verduras variadas']},
-     mer:{n:'Fruta y un yogur',ing:['Fruta','Yogur']},
-     cen:{n:'Dorada al horno con ensalada',ing:['Dorada','Limón','Lechuga','Tomate','Cebolla']}}
-  ];
+  // Catálogo de comidas. Los 7 primeros de cada tipo son el menú por defecto (uno por día);
+  // el resto son alternativas que puedes elegir desde el botón Cambiar.
+  const POOL={
+    // desayunos (12 opciones)
+    des:[
+      {n:'Tostadas con tomate, aceite y jamón + café',ing:['Pan','Tomate rallado','Aceite de oliva','Jamón serrano','Café']},
+      {n:'Yogur con avena, fruta y miel',ing:['Yogur','Copos de avena','Fruta de temporada','Miel']},
+      {n:'Tostada de aguacate y huevo',ing:['Pan','Aguacate','Huevo','Sal','Aceite']},
+      {n:'Café con leche y tostada integral con pavo',ing:['Leche','Café','Pan integral','Pavo']},
+      {n:'Tostadas con tomate y jamón + fruta',ing:['Pan','Tomate','Jamón','Fruta']},
+      {n:'Huevos revueltos con pan integral',ing:['Huevos','Pan integral','Aceite','Sal']},
+      {n:'Tostada con queso fresco y tomate',ing:['Pan','Queso fresco','Tomate','Aceite']},
+      {n:'Café con leche y bocadillo de tortilla',ing:['Pan','Huevos','Leche','Café','Aceite']},
+      {n:'Porridge de avena con plátano y canela',ing:['Copos de avena','Leche','Plátano','Canela']},
+      {n:'Tostadas con crema de cacahuete y plátano',ing:['Pan integral','Crema de cacahuete','Plátano']},
+      {n:'Revuelto de huevo con jamón y tomate',ing:['Huevos','Jamón','Tomate','Aceite']},
+      {n:'Batido de leche, avena, plátano y cacao',ing:['Leche','Copos de avena','Plátano','Cacao puro']}
+    ],
+    // comidas (14 opciones)
+    com:[
+      {n:'Lentejas con verduras y huevo cocido',ing:['Lentejas','Zanahoria','Cebolla','Pimiento','Huevo','Laurel']},
+      {n:'Pechuga de pollo con arroz y verduras',ing:['Pechuga de pollo','Arroz','Calabacín','Pimiento','Cebolla']},
+      {n:'Garbanzos con espinacas y bacalao',ing:['Garbanzos','Espinacas','Bacalao desalado','Ajo','Tomate']},
+      {n:'Pasta integral con atún y tomate',ing:['Pasta integral','Atún al natural','Tomate','Aceitunas']},
+      {n:'Arroz con pollo y verduras',ing:['Arroz','Pollo','Guisantes','Zanahoria','Pimiento']},
+      {n:'Pisto con huevo y pan',ing:['Calabacín','Pimiento','Tomate','Cebolla','Huevo','Pan']},
+      {n:'Arroz con verduras y pollo',ing:['Arroz','Pollo','Verduras variadas']},
+      {n:'Macarrones con carne picada y tomate',ing:['Macarrones','Carne picada','Tomate','Cebolla','Ajo']},
+      {n:'Ensalada de pasta con atún y huevo',ing:['Pasta','Atún','Huevo','Tomate','Aceitunas','Maíz']},
+      {n:'Guiso de ternera con patata y zanahoria',ing:['Ternera','Patata','Zanahoria','Cebolla','Laurel']},
+      {n:'Alubias blancas con verduras',ing:['Alubias','Puerro','Zanahoria','Pimiento','Pimentón']},
+      {n:'Pollo al horno con patatas y pimiento',ing:['Pollo','Patata','Pimiento','Cebolla','Romero']},
+      {n:'Salteado de arroz con huevo y verduras',ing:['Arroz','Huevos','Guisantes','Zanahoria','Cebolla']},
+      {n:'Lomo a la plancha con ensalada y pan',ing:['Lomo de cerdo','Lechuga','Tomate','Pan','Aceite']}
+    ],
+    // meriendas (12 opciones)
+    mer:[
+      {n:'Yogur natural con nueces y plátano',ing:['Yogur natural','Nueces','Plátano']},
+      {n:'Tosta con queso fresco y pavo',ing:['Pan integral','Queso fresco','Pavo en lonchas']},
+      {n:'Queso batido con fruta',ing:['Queso batido','Fruta','Canela']},
+      {n:'Fruta con puñado de frutos secos',ing:['Fruta','Almendras o nueces']},
+      {n:'Yogur griego con miel y nueces',ing:['Yogur griego','Miel','Nueces']},
+      {n:'Queso fresco batido con fruta',ing:['Queso batido','Fruta']},
+      {n:'Fruta y un yogur',ing:['Fruta','Yogur']},
+      {n:'Bocadillo pequeño de pavo y queso',ing:['Pan','Pavo','Queso']},
+      {n:'Requesón con miel y nueces',ing:['Requesón','Miel','Nueces']},
+      {n:'Tostada con aguacate y tomate',ing:['Pan','Aguacate','Tomate']},
+      {n:'Puñado de almendras y una manzana',ing:['Almendras','Manzana']},
+      {n:'Batido de proteína con leche',ing:['Proteína en polvo','Leche']}
+    ],
+    // cenas (14 opciones)
+    cen:[
+      {n:'Merluza a la plancha con patata y ensalada',ing:['Merluza','Patata','Lechuga','Tomate','Aceite']},
+      {n:'Tortilla francesa de 3 huevos con ensalada',ing:['Huevos','Aceite','Lechuga','Tomate','Cebolla']},
+      {n:'Pavo a la plancha con verduras al horno',ing:['Filetes de pavo','Calabacín','Berenjena','Pimiento','Aceite']},
+      {n:'Salmón al horno con brócoli',ing:['Salmón','Brócoli','Limón','Aceite']},
+      {n:'Ensalada de garbanzos con atún',ing:['Garbanzos cocidos','Atún','Tomate','Cebolla','Huevo']},
+      {n:'Pechuga a la plancha con patata asada',ing:['Pechuga de pollo','Patata','Aceite','Romero']},
+      {n:'Dorada al horno con ensalada',ing:['Dorada','Limón','Lechuga','Tomate','Cebolla']},
+      {n:'Crema de calabacín con huevo duro',ing:['Calabacín','Cebolla','Patata','Huevo']},
+      {n:'Revuelto de setas y gambas',ing:['Huevos','Setas','Gambas','Ajo','Aceite']},
+      {n:'Atún a la plancha con pimientos',ing:['Atún fresco','Pimiento','Cebolla','Aceite']},
+      {n:'Ensalada completa de pollo y aguacate',ing:['Pollo','Aguacate','Lechuga','Tomate','Nueces']},
+      {n:'Sopa de verduras con pollo desmenuzado',ing:['Caldo','Verduras variadas','Pollo','Fideos']},
+      {n:'Tortilla de patata y cebolla con ensalada',ing:['Huevos','Patata','Cebolla','Lechuga','Aceite']},
+      {n:'Pescado blanco al vapor con verduras',ing:['Pescado blanco','Brócoli','Zanahoria','Limón']}
+    ]
+  };
+
+  const SLOTS=['des','com','mer','cen'], SLOT_NAME=['Desayuno','Comida','Merienda','Cena'];
+  // elección guardada por día; si no hay, el menú por defecto según el día de la semana
+  function mealPick(key,i){
+    const r=S.days[key];
+    if(r&&r.pick&&r.pick[i]!=null) return r.pick[i];
+    return new Date(key+'T00:00:00').getDay();
+  }
+  function mealOf(key,i){ const p=POOL[SLOTS[i]]; return p[mealPick(key,i)%p.length]; }
 
   const DRINKS=[
     {id:'cana',ic:'🍺',lb:'Caña 200ml',kcal:90},
@@ -760,7 +833,7 @@
   function dayRec(k){ const wk=wkOf(k); if(!S.days[k]) S.days[k]=blankDay(wk); const r=S.days[k];
     r.w=wk.day; r.v=wk.vi;
     if(!Array.isArray(r.ex)||r.ex.length!==wk.ex.length) r.ex=new Array(wk.ex.length).fill(false);
-    if(!r.extras) r.extras=[]; if(!r.drinks) r.drinks=[]; return r; }
+    if(!r.extras) r.extras=[]; if(!r.drinks) r.drinks=[]; if(!r.pick) r.pick=[null,null,null,null]; return r; }
   function today(){ return dayRec(todayKey()); }
 
   // Almacenamiento: usa el del visor de Claude si existe; si no (móvil/archivo standalone), localStorage.
@@ -913,7 +986,7 @@
   let mSel='today';
   function mKey(){ const d=new Date(); if(mSel==='tomorrow') d.setDate(d.getDate()+1); return keyOf(d); }
   function renderComida(){
-    const isT=(mSel==='tomorrow'), key=mKey(), rec=dayRec(key), t=targets(), m=MEALS[new Date(key+'T00:00:00').getDay()];
+    const isT=(mSel==='tomorrow'), key=mKey(), rec=dayRec(key), t=targets();
     document.querySelectorAll('#mSeg button').forEach(b=>b.classList.toggle('on',b.dataset.m===mSel));
     document.getElementById('mealEyebrow').textContent=isT?'Objetivo de mañana':'Objetivo de hoy';
     document.getElementById('menuEyebrow').textContent=isT?'Menú de mañana':'Menú del día';
@@ -922,13 +995,17 @@
     document.getElementById('mKcal').textContent=t.kcal; document.getElementById('mProt').textContent=t.prot;
     document.getElementById('mDone').textContent=isT?'—':(rec.meals.filter(Boolean).length+'/4');
     document.getElementById('mealNote').textContent=isT?'Vista previa para que puedas comprar o cocinar con antelación.':'Marca cada comida al terminarla. Las cantidades ajústalas a tu apetito.';
-    const names=['Desayuno','Comida','Merienda','Cena'],keys=['des','com','mer','cen'];
     const ml=document.getElementById('mealList'); ml.innerHTML='';
-    keys.forEach((k,i)=>{ const meal=m[k]; const card=document.createElement('div'); card.className='meal-card'+((!isT&&rec.meals[i])?' on':'');
+    SLOTS.forEach((k,i)=>{ const meal=mealOf(key,i);
+      const card=document.createElement('div'); card.className='meal-card'+((!isT&&rec.meals[i])?' on':'');
       const chips=meal.ing.map(x=>'<span class="ing">'+x+'</span>').join('');
+      const swapped = rec.pick && rec.pick[i]!=null && rec.pick[i]!==new Date(key+'T00:00:00').getDay();
       card.innerHTML='<div class="meal-head">'+(isT?'<span class="dotmark"></span>':'<button class="chk" aria-label="Marcar"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></button>')+
-        '<div class="body"><div class="tag">'+names[i]+'</div><div class="meal-name">'+meal.n+'</div></div></div><div class="ingredients">'+chips+'</div>';
+        '<div class="body"><div class="tag">'+SLOT_NAME[i]+(swapped?' <span class="swapped">cambiada</span>':'')+'</div><div class="meal-name">'+meal.n+'</div></div>'+
+        '<button class="swapbtn" aria-label="Cambiar comida"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 2l4 4-4 4"/><path d="M3 6h18"/><path d="M7 22l-4-4 4-4"/><path d="M21 18H3"/></svg></button>'+
+        '</div><div class="ingredients">'+chips+'</div>';
       if(!isT) card.querySelector('.chk').addEventListener('click',e=>{tap(e.currentTarget);rec.meals[i]=!rec.meals[i];save();renderComida();});
+      card.querySelector('.swapbtn').addEventListener('click',()=>{ vibe(12); openSwap(key,i); });
       ml.appendChild(card); });
     renderShop();
     renderElevation(); renderHeader();
@@ -951,9 +1028,9 @@
     if(shopRange==='week'){
       const base=new Date(mKey()+'T00:00:00');
       for(let i=0;i<7;i++){ const d=new Date(base); d.setDate(d.getDate()+i);
-        const mm=MEALS[d.getDay()]; keys.forEach(k=>add(mm[k].ing)); }
+        const k2=keyOf(d); for(let s=0;s<4;s++) add(mealOf(k2,s).ing); }
     } else {
-      const mm=MEALS[new Date(mKey()+'T00:00:00').getDay()]; keys.forEach(k=>add(mm[k].ing));
+      const k2=mKey(); for(let s=0;s<4;s++) add(mealOf(k2,s).ing);
     }
     return out.sort((a,b)=>a.localeCompare(b,'es'));
   }
@@ -1297,6 +1374,31 @@
     document.getElementById('pPause').querySelector('span').textContent=sPaused?'Seguir':'Pausa'; });
   document.getElementById('pSkip').addEventListener('click',advance);
   document.getElementById('pClose').addEventListener('click',()=>{ if(confirm('¿Salir del entrenamiento? Se guarda lo que ya has completado.')) closePlayer(); });
+
+  /* ===== CAMBIAR COMIDA ===== */
+  let swapKey=null, swapSlot=0;
+  function openSwap(key,i){
+    swapKey=key; swapSlot=i;
+    const opts=POOL[SLOTS[i]], cur=mealPick(key,i)%opts.length, def=new Date(key+'T00:00:00').getDay();
+    document.getElementById('swapTitle').textContent=SLOT_NAME[i];
+    document.getElementById('swapLede').textContent=opts.length+' opciones. Toca la que prefieras para hoy.';
+    const box=document.getElementById('swapList'); box.innerHTML='';
+    opts.forEach((o,idx)=>{
+      const el=document.createElement('button'); el.className='swapopt'+(idx===cur?' sel':'');
+      el.innerHTML='<div class="so-top"><span class="so-n">'+o.n+'</span>'+(idx===def?'<span class="so-def">del menú</span>':'')+'</div>'+
+        '<div class="so-ing">'+o.ing.join(' · ')+'</div>';
+      el.addEventListener('click',()=>{ vibe(12);
+        const r=dayRec(swapKey); r.pick[swapSlot]=idx; save(); closeSwap(); renderComida(); toast('Comida cambiada'); });
+      box.appendChild(el);
+    });
+    document.getElementById('swapBg').classList.add('open');
+    document.getElementById('swapSheet').classList.add('open');
+  }
+  function closeSwap(){ document.getElementById('swapBg').classList.remove('open'); document.getElementById('swapSheet').classList.remove('open'); }
+  document.getElementById('swapBg').addEventListener('click',closeSwap);
+  document.getElementById('swapClose').addEventListener('click',closeSwap);
+  document.getElementById('swapReset').addEventListener('click',()=>{
+    if(swapKey==null) return; const r=dayRec(swapKey); r.pick[swapSlot]=null; save(); closeSwap(); renderComida(); toast('Menú restaurado'); });
 
   /* ===== CARGAS POR EJERCICIO ===== */
   function loadHist(name){ return (S.loads&&S.loads[name])?S.loads[name]:[]; }
