@@ -271,6 +271,10 @@
   .player.open{display:flex;}
   .player.rest{background:#0c1408;} .player.prep{background:#0e1012;}
   .p-top{display:flex;align-items:center;justify-content:space-between;}
+  .awake{width:40px;height:40px;display:flex;align-items:center;justify-content:center;color:var(--muted2);opacity:0;transition:opacity .4s;}
+  .awake.on{opacity:1;color:var(--done);}
+  .awake.off{opacity:1;color:var(--gold);}
+  .awake svg{width:18px;height:18px;}
   .p-close{width:40px;height:40px;border-radius:11px;border:1px solid var(--line2);background:transparent;color:var(--muted);display:flex;align-items:center;justify-content:center;font-size:20px;}
   .p-step{font-family:'JetBrains Mono';font-size:12px;color:var(--muted);letter-spacing:.05em;}
   .p-phase{font-family:'Archivo';font-weight:800;font-size:13px;letter-spacing:.18em;text-transform:uppercase;color:var(--effort);text-align:center;margin-top:2px;}
@@ -506,7 +510,9 @@
   <div class="p-top">
     <button class="p-close" id="pClose" aria-label="Salir">✕</button>
     <div style="text-align:center;"><div class="p-phase" id="pPhase">Prepárate</div><div class="p-step" id="pStep"></div></div>
-    <div style="width:40px;"></div>
+    <div class="awake" id="awakeInd" title="Pantalla activa">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+    </div>
   </div>
   <div class="p-mid" id="pMid">
     <div id="pActive">
@@ -1142,11 +1148,49 @@
     ph.push({kind:'done'});
     return ph;
   }
+  /* ===== MANTENER LA PANTALLA ENCENDIDA DURANTE EL ENTRENO ===== */
+  let wakeLock=null, wakeFallback=null;
+  async function keepAwake(){
+    // 1) API oficial (Chrome Android, Safari iOS 16.4+)
+    if('wakeLock' in navigator){
+      try{ wakeLock=await navigator.wakeLock.request('screen');
+        wakeLock.addEventListener('release',()=>{ wakeLock=null; });
+        return true;
+      }catch(e){ /* denegado o no disponible */ }
+    }
+    // 2) Respaldo: vídeo mudo en bucle (funciona en iOS antiguos)
+    try{
+      if(!wakeFallback){
+        const v=document.createElement('video');
+        v.setAttribute('playsinline',''); v.muted=true; v.loop=true;
+        v.style.cssText='position:fixed;width:1px;height:1px;opacity:0.01;pointer-events:none;bottom:0;left:0;';
+        // vídeo mínimo embebido (1 frame negro)
+        v.src='data:video/mp4;base64,AAAAIGZ0eXBpc29tAAACAGlzb21pc28yYXZjMW1wNDEAAAAIZnJlZQAAAr1tZGF0AAACrgYF//+q3EXpvebZSLeWLNgg2SPu73gyNjQgLSBjb3JlIDE1MiByMjg1NCBlOWE1OTAzIC0gSC4yNjQvTVBFRy00IEFWQyBjb2RlYyAtIENvcHlsZWZ0IDIwMDMtMjAxNyAtIGh0dHA6Ly93d3cudmlkZW9sYW4ub3JnL3gyNjQuaHRtbAAAAAZibW9vdgAAAGxtdmhkAAAAAAAAAAAAAAAAAAAD6AAAAAABAAEAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAB';
+        document.body.appendChild(v); wakeFallback=v;
+      }
+      await wakeFallback.play().catch(()=>{});
+      return true;
+    }catch(e){ return false; }
+  }
+  function releaseAwake(){
+    try{ if(wakeLock){ wakeLock.release(); wakeLock=null; } }catch(e){}
+    try{ if(wakeFallback){ wakeFallback.pause(); } }catch(e){}
+  }
+  // si el móvil se bloquea o cambias de app, al volver se vuelve a pedir
+  document.addEventListener('visibilitychange',()=>{
+    const open=document.getElementById('player').classList.contains('open');
+    if(document.visibilityState==='visible' && open && !wakeLock) keepAwake();
+  });
+
   function startSession(){
     const w=wkToday();
     session=buildSession(w); sIdx=0; sPaused=false;
     try{ if(!audioCtx) audioCtx=new (window.AudioContext||window.webkitAudioContext)(); if(audioCtx.state==='suspended') audioCtx.resume(); }catch(e){}
     document.getElementById('player').classList.add('open');
+    keepAwake().then(ok=>{ const ind=document.getElementById('awakeInd');
+      ind.className='awake '+(ok?'on':'off');
+      ind.title = ok?'La pantalla no se apagará durante el entreno':'Tu móvil puede apagar la pantalla: desactiva el bloqueo automático';
+    });
     enterPhase();
   }
   function enterPhase(){
@@ -1246,7 +1290,7 @@
     renderHeader(); renderElevation(); renderEntreno();
     setTimeout(closePlayer, 2600);
   }
-  function closePlayer(){ clearInterval(sTimer); document.getElementById('player').classList.remove('open'); renderEntreno(); renderHeader(); renderElevation(); }
+  function closePlayer(){ clearInterval(sTimer); releaseAwake(); document.getElementById('player').classList.remove('open'); renderEntreno(); renderHeader(); renderElevation(); }
 
   document.getElementById('startWorkout').addEventListener('click',startSession);
   document.getElementById('pPause').addEventListener('click',()=>{ sPaused=!sPaused;
