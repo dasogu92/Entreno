@@ -159,6 +159,13 @@
   .shop-foot{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:15px;padding-top:13px;border-top:1px solid var(--line);}
   .shop-foot span{font-size:11.5px;color:var(--muted);}
 
+  /* cambiar entreno */
+  .wtitle-row{display:flex;align-items:flex-start;gap:12px;margin-bottom:3px;}
+  .wtitle-row h2{margin:0;flex:1;}
+  .wtitle-row .swapbtn{margin-top:2px;}
+  .wgrp{margin-bottom:16px;}
+  .wgrp-t{font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;}
+
   /* cambiar comida */
   .meal-head{display:flex;align-items:flex-start;gap:14px;}
   .swapbtn{margin-left:auto;flex-shrink:0;width:34px;height:34px;border-radius:10px;border:1px solid var(--line2);
@@ -347,7 +354,12 @@
       <div class="dayseg" id="wSeg"><button data-w="today" class="on">Hoy</button><button data-w="tomorrow">Mañana</button></div>
       <div class="card">
         <div class="eyebrow"><span class="dot"></span><span id="workoutTag">Entreno</span></div>
-        <h2 id="workoutTitle">—</h2>
+        <div class="wtitle-row">
+          <h2 id="workoutTitle">—</h2>
+          <button class="swapbtn" id="wSwapBtn" aria-label="Cambiar entreno">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 2l4 4-4 4"/><path d="M3 6h18"/><path d="M7 22l-4-4 4-4"/><path d="M21 18H3"/></svg>
+          </button>
+        </div>
         <button class="startbtn" id="startWorkout"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg><span id="startLabel">Iniciar entrenamiento</span></button>
         <div class="metaline"><span><b id="metaEx">0</b> ejercicios</span><span><b id="metaTime">0 min</b> aprox</span></div>
         <div class="prog"><i id="workoutBar" style="width:0%"></i></div>
@@ -519,6 +531,17 @@
     <button class="save-profile" id="loadSave">Guardar carga</button>
     <button class="danger" id="loadClose">Cancelar</button>
   </div>
+  <div class="sheet-bg" id="wswapBg"></div>
+  <div class="sheet" id="wswapSheet">
+    <div class="grab"></div>
+    <h3>Cambiar entreno</h3>
+    <p class="lede" id="wswapLede" style="margin-top:-10px;">Elige otra sesión solo para este día.</p>
+    <div class="field"><label>Intensidad de hoy</label>
+      <div class="seg" id="wswapInt"><button data-i="soft">Suave</button><button data-i="normal" class="on">Normal</button><button data-i="hard">Intenso</button></div></div>
+    <div id="wswapList"></div>
+    <button class="btn-sec" id="wswapReset" style="width:100%;margin-top:6px;">Volver al entreno de hoy</button>
+    <button class="danger" id="wswapClose">Cerrar</button>
+  </div>
   <div class="sheet-bg" id="swapBg"></div>
   <div class="sheet" id="swapSheet">
     <div class="grab"></div>
@@ -569,133 +592,219 @@
   /* ===== WORKOUTS (estructura con tiempos) ===== */
   // mode: 'time' (dur seg) | 'reps' (reps + ventana estimada). rest = seg entre series.
   // Cada día tiene 3 variantes (A/B/C) que rotan por semana: mismo grupo muscular, ejercicios distintos.
+  // Cada día tiene 3 variantes (A/B/C) que rotan por semana. Sesiones de 40-45 min en intensidad Normal.
   const WORKOUTS=[
     {tag:'Recuperación · Domingo', intensity:1, variants:[
-      {title:'Descanso activo — paseo', ex:[
-        {nm:'Paseo o bici muy suave', mode:'time', sets:1, dur:1500, rest:0},
-        {nm:'Movilidad de cadera y hombro', mode:'time', sets:1, dur:600, rest:30},
-        {nm:'Estiramientos generales', mode:'time', sets:1, dur:600, rest:0}]},
+      {title:'Descanso activo — paseo largo', ex:[
+        {nm:'Paseo o bici muy suave', mode:'time', sets:1, dur:1500, rest:45},
+        {nm:'Movilidad de cadera', mode:'time', sets:1, dur:300, rest:30},
+        {nm:'Movilidad de hombro y torácica', mode:'time', sets:1, dur:300, rest:30},
+        {nm:'Estiramiento de isquios y gemelos', mode:'time', sets:1, dur:300, rest:30},
+        {nm:'Respiración y relajación', mode:'time', sets:1, dur:300, rest:0}
+      ]},
       {title:'Descanso activo — movilidad', ex:[
-        {nm:'Movilidad columna (gato-camello)', mode:'time', sets:1, dur:420, rest:30},
-        {nm:'Estiramiento de cadera y psoas', mode:'time', sets:1, dur:480, rest:30},
-        {nm:'Paseo tranquilo', mode:'time', sets:1, dur:1200, rest:0}]},
+        {nm:'Paseo tranquilo', mode:'time', sets:1, dur:1080, rest:45},
+        {nm:'Gato-camello y rotaciones', mode:'time', sets:1, dur:330, rest:30},
+        {nm:'Estiramiento de psoas y cuádriceps', mode:'time', sets:1, dur:330, rest:30},
+        {nm:'Apertura de pecho con banda', mode:'time', sets:1, dur:300, rest:30},
+        {nm:'Plancha suave y respiración', mode:'time', sets:1, dur:300, rest:0}
+      ]},
       {title:'Descanso activo — yoga suave', ex:[
-        {nm:'Saludo al sol lento', mode:'time', sets:1, dur:480, rest:30},
-        {nm:'Estiramiento isquios y espalda', mode:'time', sets:1, dur:480, rest:30},
-        {nm:'Respiración y relajación', mode:'time', sets:1, dur:300, rest:0}]}
+        {nm:'Saludo al sol lento', mode:'time', sets:1, dur:600, rest:45},
+        {nm:'Guerrero y equilibrio', mode:'time', sets:1, dur:480, rest:30},
+        {nm:'Postura del niño y torsiones', mode:'time', sets:1, dur:420, rest:30},
+        {nm:'Estiramiento de espalda baja', mode:'time', sets:1, dur:420, rest:30},
+        {nm:'Relajación final', mode:'time', sets:1, dur:300, rest:0}
+      ]}
     ]},
     {tag:'Fuerza · Lunes', intensity:4, variants:[
       {title:'Empuje A — press y hombro', ex:[
-        {nm:'Press banca con mancuernas', mode:'reps', sets:4, reps:10, rest:60},
-        {nm:'Press militar de pie', mode:'reps', sets:3, reps:10, rest:60},
+        {nm:'Calentamiento: movilidad y activación', mode:'time', sets:1, dur:300, rest:45},
+        {nm:'Press banca con mancuernas', mode:'reps', sets:4, reps:10, rest:75},
+        {nm:'Press militar de pie', mode:'reps', sets:4, reps:10, rest:75},
+        {nm:'Press inclinado con mancuernas', mode:'reps', sets:3, reps:12, rest:60},
         {nm:'Fondos en banco o silla', mode:'reps', sets:3, reps:12, rest:60},
-        {nm:'Elevaciones laterales', mode:'reps', sets:3, reps:15, rest:45},
-        {nm:'Plancha frontal', mode:'time', sets:3, dur:40, rest:40}]},
-      {title:'Empuje B — flexiones y aperturas', ex:[
-        {nm:'Flexiones lastradas o lentas', mode:'reps', sets:4, reps:12, rest:60},
-        {nm:'Press Arnold con mancuernas', mode:'reps', sets:3, reps:10, rest:60},
-        {nm:'Aperturas con mancuernas', mode:'reps', sets:3, reps:12, rest:50},
-        {nm:'Extensión de tríceps sobre cabeza', mode:'reps', sets:3, reps:12, rest:45},
-        {nm:'Plancha con toque de hombro', mode:'reps', sets:3, reps:20, rest:40}]},
-      {title:'Empuje C — inclinado y banda', ex:[
-        {nm:'Press inclinado con mancuernas', mode:'reps', sets:4, reps:10, rest:60},
-        {nm:'Press de hombro con banda', mode:'reps', sets:3, reps:15, rest:45},
+        {nm:'Elevaciones laterales', mode:'reps', sets:3, reps:15, rest:50},
+        {nm:'Extensión de tríceps sobre cabeza', mode:'reps', sets:3, reps:12, rest:50},
+        {nm:'Plancha frontal', mode:'time', sets:3, dur:45, rest:45}
+      ]},
+      {title:'Empuje B — flexiones y volumen', ex:[
+        {nm:'Calentamiento: movilidad y activación', mode:'time', sets:1, dur:300, rest:45},
+        {nm:'Flexiones lastradas o lentas', mode:'reps', sets:4, reps:12, rest:75},
+        {nm:'Press Arnold con mancuernas', mode:'reps', sets:4, reps:10, rest:75},
+        {nm:'Aperturas con mancuernas', mode:'reps', sets:3, reps:12, rest:60},
         {nm:'Flexiones diamante', mode:'reps', sets:3, reps:10, rest:60},
-        {nm:'Elevación frontal', mode:'reps', sets:3, reps:12, rest:45},
-        {nm:'Plancha lateral', mode:'time', sets:3, dur:35, rest:35}]}
+        {nm:'Elevación frontal', mode:'reps', sets:3, reps:12, rest:50},
+        {nm:'Patada de tríceps', mode:'reps', sets:3, reps:14, rest:50},
+        {nm:'Plancha con toque de hombro', mode:'time', sets:3, dur:45, rest:45}
+      ]},
+      {title:'Empuje C — inclinado y banda', ex:[
+        {nm:'Calentamiento: movilidad y activación', mode:'time', sets:1, dur:300, rest:45},
+        {nm:'Press inclinado con mancuernas', mode:'reps', sets:4, reps:10, rest:75},
+        {nm:'Press de hombro con banda', mode:'reps', sets:4, reps:15, rest:60},
+        {nm:'Flexiones con pies elevados', mode:'reps', sets:3, reps:12, rest:60},
+        {nm:'Aperturas inclinadas', mode:'reps', sets:3, reps:12, rest:60},
+        {nm:'Pájaros (deltoide posterior)', mode:'reps', sets:3, reps:15, rest:50},
+        {nm:'Fondos entre sillas', mode:'reps', sets:3, reps:12, rest:55},
+        {nm:'Plancha lateral', mode:'time', sets:3, dur:40, rest:40}
+      ]}
     ]},
     {tag:'Fuerza · Martes', intensity:4, variants:[
-      {title:'Tirón A — remo a una mano', ex:[
-        {nm:'Remo mancuerna a una mano', mode:'reps', sets:4, reps:10, rest:60},
-        {nm:'Remo con banda elástica', mode:'reps', sets:3, reps:15, rest:45},
-        {nm:'Curl de bíceps', mode:'reps', sets:3, reps:12, rest:45},
-        {nm:'Superman', mode:'reps', sets:3, reps:15, rest:40},
-        {nm:'Dead bug', mode:'reps', sets:3, reps:12, rest:40}]},
-      {title:'Tirón B — remo doble y martillo', ex:[
-        {nm:'Remo con dos mancuernas', mode:'reps', sets:4, reps:12, rest:60},
-        {nm:'Pull-over con mancuerna', mode:'reps', sets:3, reps:12, rest:50},
-        {nm:'Curl martillo', mode:'reps', sets:3, reps:12, rest:45},
-        {nm:'Face pull con banda', mode:'reps', sets:3, reps:15, rest:45},
-        {nm:'Plancha frontal', mode:'time', sets:3, dur:45, rest:40}]},
-      {title:'Tirón C — banda y concentrado', ex:[
-        {nm:'Remo bajo con banda', mode:'reps', sets:4, reps:15, rest:50},
-        {nm:'Remo renegado con mancuernas', mode:'reps', sets:3, reps:10, rest:60},
-        {nm:'Curl concentrado', mode:'reps', sets:3, reps:12, rest:45},
-        {nm:'Buenos días con mancuerna', mode:'reps', sets:3, reps:12, rest:50},
-        {nm:'Bicho muerto lento', mode:'reps', sets:3, reps:12, rest:40}]}
+      {title:'Tirón A — remo y bíceps', ex:[
+        {nm:'Calentamiento: movilidad y activación', mode:'time', sets:1, dur:300, rest:45},
+        {nm:'Remo mancuerna a una mano', mode:'reps', sets:4, reps:10, rest:75},
+        {nm:'Remo con dos mancuernas', mode:'reps', sets:4, reps:12, rest:70},
+        {nm:'Pull-over con mancuerna', mode:'reps', sets:3, reps:12, rest:60},
+        {nm:'Remo con banda elástica', mode:'reps', sets:3, reps:15, rest:50},
+        {nm:'Curl de bíceps', mode:'reps', sets:3, reps:12, rest:50},
+        {nm:'Curl martillo', mode:'reps', sets:3, reps:12, rest:50},
+        {nm:'Superman y dead bug', mode:'time', sets:3, dur:45, rest:45}
+      ]},
+      {title:'Tirón B — espalda alta', ex:[
+        {nm:'Calentamiento: movilidad y activación', mode:'time', sets:1, dur:300, rest:45},
+        {nm:'Remo renegado con mancuernas', mode:'reps', sets:4, reps:10, rest:75},
+        {nm:'Remo inclinado a dos manos', mode:'reps', sets:4, reps:12, rest:70},
+        {nm:'Face pull con banda', mode:'reps', sets:3, reps:15, rest:55},
+        {nm:'Buenos días con mancuerna', mode:'reps', sets:3, reps:12, rest:60},
+        {nm:'Curl concentrado', mode:'reps', sets:3, reps:12, rest:50},
+        {nm:'Curl inverso', mode:'reps', sets:3, reps:14, rest:50},
+        {nm:'Plancha frontal', mode:'time', sets:3, dur:45, rest:45}
+      ]},
+      {title:'Tirón C — banda y control', ex:[
+        {nm:'Calentamiento: movilidad y activación', mode:'time', sets:1, dur:300, rest:45},
+        {nm:'Remo bajo con banda', mode:'reps', sets:4, reps:15, rest:60},
+        {nm:'Remo mancuerna a una mano lento', mode:'reps', sets:4, reps:10, rest:75},
+        {nm:'Pull-over con banda', mode:'reps', sets:3, reps:15, rest:55},
+        {nm:'Encogimientos de hombros', mode:'reps', sets:3, reps:15, rest:50},
+        {nm:'Curl de bíceps a una mano', mode:'reps', sets:3, reps:12, rest:50},
+        {nm:'Superman', mode:'reps', sets:3, reps:15, rest:45},
+        {nm:'Bicho muerto lento', mode:'time', sets:3, dur:45, rest:45}
+      ]}
     ]},
     {tag:'Cardio · Miércoles', intensity:5, variants:[
-      {title:'HIIT A — burpees y zancadas', ex:[
-        {nm:'Burpees', mode:'time', sets:4, dur:40, rest:20},
-        {nm:'Zancadas con salto', mode:'time', sets:4, dur:40, rest:20},
-        {nm:'Mountain climbers', mode:'time', sets:4, dur:30, rest:20},
-        {nm:'Plancha con toque de hombro', mode:'time', sets:3, dur:40, rest:20}]},
-      {title:'HIIT B — tabata sentadilla', ex:[
-        {nm:'Sentadilla con salto', mode:'time', sets:4, dur:30, rest:20},
-        {nm:'Escaladores rápidos', mode:'time', sets:4, dur:30, rest:20},
-        {nm:'Skipping alto', mode:'time', sets:4, dur:40, rest:20},
-        {nm:'Plancha dinámica', mode:'time', sets:3, dur:40, rest:25}]},
-      {title:'HIIT C — comba y core', ex:[
-        {nm:'Comba o carrera en el sitio', mode:'time', sets:4, dur:60, rest:25},
-        {nm:'Burpees sin salto', mode:'time', sets:4, dur:35, rest:25},
-        {nm:'Zancadas alternas rápidas', mode:'time', sets:3, dur:40, rest:20},
-        {nm:'Russian twist', mode:'time', sets:3, dur:40, rest:20}]}
+      {title:'HIIT A — bloque quemagrasa', ex:[
+        {nm:'Calentamiento progresivo', mode:'time', sets:1, dur:300, rest:30},
+        {nm:'Burpees', mode:'time', sets:5, dur:40, rest:25},
+        {nm:'Zancadas con salto', mode:'time', sets:5, dur:40, rest:25},
+        {nm:'Mountain climbers', mode:'time', sets:5, dur:35, rest:25},
+        {nm:'Sentadilla con salto', mode:'time', sets:5, dur:35, rest:25},
+        {nm:'Skipping alto', mode:'time', sets:5, dur:40, rest:25},
+        {nm:'Plancha con toque de hombro', mode:'time', sets:3, dur:45, rest:30},
+        {nm:'Vuelta a la calma', mode:'time', sets:1, dur:300, rest:0}
+      ]},
+      {title:'HIIT B — tabata doble', ex:[
+        {nm:'Calentamiento progresivo', mode:'time', sets:1, dur:300, rest:30},
+        {nm:'Sentadilla con salto', mode:'time', sets:6, dur:30, rest:20},
+        {nm:'Escaladores rápidos', mode:'time', sets:6, dur:30, rest:20},
+        {nm:'Burpees sin salto', mode:'time', sets:5, dur:35, rest:25},
+        {nm:'Zancadas alternas rápidas', mode:'time', sets:5, dur:35, rest:25},
+        {nm:'Comba o carrera en el sitio', mode:'time', sets:5, dur:60, rest:30},
+        {nm:'Plancha dinámica', mode:'time', sets:3, dur:45, rest:30},
+        {nm:'Vuelta a la calma', mode:'time', sets:1, dur:300, rest:0}
+      ]},
+      {title:'HIIT C — circuito y core', ex:[
+        {nm:'Calentamiento progresivo', mode:'time', sets:1, dur:300, rest:30},
+        {nm:'Comba o carrera en el sitio', mode:'time', sets:5, dur:60, rest:30},
+        {nm:'Burpees', mode:'time', sets:4, dur:40, rest:25},
+        {nm:'Thruster con mancuernas', mode:'time', sets:4, dur:40, rest:30},
+        {nm:'Zancadas con salto', mode:'time', sets:4, dur:35, rest:25},
+        {nm:'Russian twist', mode:'time', sets:4, dur:40, rest:25},
+        {nm:'Hollow hold', mode:'time', sets:4, dur:35, rest:30},
+        {nm:'Zancadas isométricas', mode:'time', sets:3, dur:40, rest:25},
+        {nm:'Vuelta a la calma', mode:'time', sets:1, dur:300, rest:0}
+      ]}
     ]},
     {tag:'Fuerza · Jueves', intensity:4, variants:[
       {title:'Pierna A — goblet y zancadas', ex:[
-        {nm:'Sentadilla goblet', mode:'reps', sets:4, reps:12, rest:60},
-        {nm:'Zancadas alternas', mode:'reps', sets:3, reps:12, rest:60},
-        {nm:'Peso muerto rumano con mancuernas', mode:'reps', sets:3, reps:10, rest:60},
+        {nm:'Calentamiento: movilidad y activación', mode:'time', sets:1, dur:300, rest:45},
+        {nm:'Sentadilla goblet', mode:'reps', sets:4, reps:12, rest:75},
+        {nm:'Zancadas alternas', mode:'reps', sets:4, reps:12, rest:70},
+        {nm:'Peso muerto rumano con mancuernas', mode:'reps', sets:3, reps:10, rest:70},
+        {nm:'Step-up a silla', mode:'reps', sets:3, reps:12, rest:55},
         {nm:'Puente de glúteo', mode:'reps', sets:3, reps:15, rest:45},
-        {nm:'Elevación de gemelos', mode:'reps', sets:3, reps:20, rest:40}]},
-      {title:'Pierna B — búlgara y peso muerto', ex:[
-        {nm:'Sentadilla búlgara', mode:'reps', sets:4, reps:10, rest:60},
-        {nm:'Peso muerto a una pierna', mode:'reps', sets:3, reps:10, rest:60},
-        {nm:'Sentadilla sumo con mancuerna', mode:'reps', sets:3, reps:12, rest:60},
-        {nm:'Puente de glúteo a una pierna', mode:'reps', sets:3, reps:12, rest:45},
-        {nm:'Sentadilla isométrica en pared', mode:'time', sets:3, dur:45, rest:40}]},
-      {title:'Pierna C — step-up y volumen', ex:[
-        {nm:'Step-up a silla con mancuernas', mode:'reps', sets:4, reps:12, rest:60},
-        {nm:'Sentadilla frontal con mancuernas', mode:'reps', sets:3, reps:12, rest:60},
-        {nm:'Zancada caminando', mode:'reps', sets:3, reps:14, rest:55},
-        {nm:'Curl femoral con banda', mode:'reps', sets:3, reps:15, rest:45},
-        {nm:'Gemelo a una pierna', mode:'reps', sets:3, reps:15, rest:40}]}
+        {nm:'Elevación de gemelos', mode:'reps', sets:3, reps:20, rest:45},
+        {nm:'Sentadilla isométrica en pared', mode:'time', sets:3, dur:45, rest:45}
+      ]},
+      {title:'Pierna B — unilateral', ex:[
+        {nm:'Calentamiento: movilidad y activación', mode:'time', sets:1, dur:300, rest:45},
+        {nm:'Sentadilla búlgara', mode:'reps', sets:4, reps:10, rest:75},
+        {nm:'Peso muerto a una pierna', mode:'reps', sets:4, reps:10, rest:70},
+        {nm:'Sentadilla sumo con mancuerna', mode:'reps', sets:3, reps:12, rest:65},
+        {nm:'Zancada caminando', mode:'reps', sets:3, reps:14, rest:60},
+        {nm:'Puente de glúteo a una pierna', mode:'reps', sets:3, reps:12, rest:50},
+        {nm:'Gemelo a una pierna', mode:'reps', sets:3, reps:15, rest:45},
+        {nm:'Plancha lateral con elevación', mode:'time', sets:3, dur:40, rest:40}
+      ]},
+      {title:'Pierna C — volumen', ex:[
+        {nm:'Calentamiento: movilidad y activación', mode:'time', sets:1, dur:300, rest:45},
+        {nm:'Sentadilla frontal con mancuernas', mode:'reps', sets:4, reps:12, rest:75},
+        {nm:'Peso muerto rumano', mode:'reps', sets:4, reps:12, rest:70},
+        {nm:'Step-up con mancuernas', mode:'reps', sets:3, reps:12, rest:60},
+        {nm:'Zancada estática', mode:'reps', sets:3, reps:12, rest:55},
+        {nm:'Curl femoral con banda', mode:'reps', sets:3, reps:15, rest:50},
+        {nm:'Elevación de gemelos', mode:'reps', sets:3, reps:20, rest:45},
+        {nm:'Sentadilla isométrica', mode:'time', sets:3, dur:45, rest:45}
+      ]}
     ]},
     {tag:'Fuerza · Viernes', intensity:4, variants:[
       {title:'Full body A — básicos', ex:[
-        {nm:'Flexiones', mode:'reps', sets:4, reps:12, rest:60},
-        {nm:'Remo con mancuerna', mode:'reps', sets:3, reps:12, rest:60},
-        {nm:'Sentadilla con mancuernas', mode:'reps', sets:3, reps:12, rest:60},
+        {nm:'Calentamiento: movilidad y activación', mode:'time', sets:1, dur:300, rest:45},
+        {nm:'Sentadilla con mancuernas', mode:'reps', sets:4, reps:12, rest:75},
+        {nm:'Flexiones', mode:'reps', sets:4, reps:12, rest:70},
+        {nm:'Remo con mancuerna', mode:'reps', sets:3, reps:12, rest:65},
         {nm:'Press de hombro', mode:'reps', sets:3, reps:10, rest:60},
-        {nm:'Plancha lateral', mode:'time', sets:2, dur:30, rest:30}]},
+        {nm:'Peso muerto rumano', mode:'reps', sets:3, reps:12, rest:65},
+        {nm:'Curl de bíceps', mode:'reps', sets:3, reps:12, rest:50},
+        {nm:'Plancha frontal y lateral', mode:'time', sets:3, dur:45, rest:45}
+      ]},
       {title:'Full body B — circuito', ex:[
-        {nm:'Thruster con mancuernas', mode:'reps', sets:4, reps:10, rest:60},
-        {nm:'Remo renegado', mode:'reps', sets:3, reps:10, rest:60},
-        {nm:'Peso muerto rumano', mode:'reps', sets:3, reps:12, rest:60},
-        {nm:'Fondos en banco', mode:'reps', sets:3, reps:12, rest:50},
-        {nm:'Plancha frontal', mode:'time', sets:3, dur:45, rest:35}]},
+        {nm:'Calentamiento: movilidad y activación', mode:'time', sets:1, dur:300, rest:45},
+        {nm:'Thruster con mancuernas', mode:'reps', sets:4, reps:10, rest:75},
+        {nm:'Remo renegado', mode:'reps', sets:4, reps:10, rest:70},
+        {nm:'Zancadas alternas', mode:'reps', sets:3, reps:12, rest:65},
+        {nm:'Fondos en banco', mode:'reps', sets:3, reps:12, rest:55},
+        {nm:'Swing con mancuerna', mode:'reps', sets:3, reps:15, rest:60},
+        {nm:'Elevaciones laterales', mode:'reps', sets:3, reps:15, rest:50},
+        {nm:'Hollow hold', mode:'time', sets:3, dur:40, rest:45}
+      ]},
       {title:'Full body C — potencia', ex:[
-        {nm:'Swing con mancuerna', mode:'reps', sets:4, reps:15, rest:55},
-        {nm:'Flexiones con apoyo alterno', mode:'reps', sets:3, reps:10, rest:60},
-        {nm:'Sentadilla goblet lenta', mode:'reps', sets:3, reps:12, rest:60},
-        {nm:'Remo con banda', mode:'reps', sets:3, reps:15, rest:45},
-        {nm:'Hollow hold', mode:'time', sets:3, dur:30, rest:35}]}
+        {nm:'Calentamiento: movilidad y activación', mode:'time', sets:1, dur:300, rest:45},
+        {nm:'Swing con mancuerna', mode:'reps', sets:4, reps:15, rest:70},
+        {nm:'Sentadilla goblet lenta', mode:'reps', sets:4, reps:12, rest:75},
+        {nm:'Flexiones con apoyo alterno', mode:'reps', sets:3, reps:10, rest:65},
+        {nm:'Remo con banda', mode:'reps', sets:3, reps:15, rest:55},
+        {nm:'Press militar', mode:'reps', sets:3, reps:10, rest:60},
+        {nm:'Peso muerto a una pierna', mode:'reps', sets:3, reps:10, rest:55},
+        {nm:'Plancha con toque de hombro', mode:'time', sets:3, dur:45, rest:45}
+      ]}
     ]},
     {tag:'Cardio · Sábado', intensity:3, variants:[
-      {title:'Cardio A — largo y movilidad', ex:[
-        {nm:'Bici, andar rápido o comba', mode:'time', sets:1, dur:1800, rest:60},
+      {title:'Cardio A — largo y core', ex:[
+        {nm:'Calentamiento progresivo', mode:'time', sets:1, dur:300, rest:30},
+        {nm:'Bici, andar rápido o comba', mode:'time', sets:1, dur:1200, rest:60},
+        {nm:'Series: 1 min fuerte / 1 min suave', mode:'time', sets:4, dur:120, rest:0},
         {nm:'Core: plancha o rueda abdominal', mode:'reps', sets:3, reps:12, rest:45},
-        {nm:'Movilidad general', mode:'time', sets:1, dur:600, rest:0}]},
-      {title:'Cardio B — series suaves', ex:[
-        {nm:'Calentamiento andando', mode:'time', sets:1, dur:600, rest:30},
+        {nm:'Crunch y elevación de piernas', mode:'reps', sets:3, reps:15, rest:45},
+        {nm:'Estiramiento final', mode:'time', sets:1, dur:300, rest:0}
+      ]},
+      {title:'Cardio B — series', ex:[
+        {nm:'Calentamiento progresivo', mode:'time', sets:1, dur:300, rest:30},
         {nm:'Series: 2 min fuerte / 2 min suave', mode:'time', sets:5, dur:240, rest:0},
-        {nm:'Core: plancha y crunch', mode:'reps', sets:3, reps:15, rest:40}]},
+        {nm:'Trote o marcha continua', mode:'time', sets:1, dur:420, rest:60},
+        {nm:'Core: plancha y crunch', mode:'reps', sets:3, reps:15, rest:45},
+        {nm:'Dead bug', mode:'reps', sets:3, reps:12, rest:45},
+        {nm:'Estiramiento final', mode:'time', sets:1, dur:300, rest:0}
+      ]},
       {title:'Cardio C — ruta larga', ex:[
-        {nm:'Bici o marcha continua', mode:'time', sets:1, dur:2400, rest:60},
-        {nm:'Estiramiento de piernas', mode:'time', sets:1, dur:480, rest:30},
-        {nm:'Core: dead bug', mode:'reps', sets:3, reps:12, rest:40}]}
+        {nm:'Calentamiento progresivo', mode:'time', sets:1, dur:300, rest:30},
+        {nm:'Bici o marcha continua', mode:'time', sets:1, dur:1800, rest:75},
+        {nm:'Tramo fuerte final', mode:'time', sets:3, dur:150, rest:45},
+        {nm:'Core: dead bug y superman', mode:'reps', sets:3, reps:15, rest:45},
+        {nm:'Estiramiento de piernas', mode:'time', sets:1, dur:360, rest:0}
+      ]}
     ]}
   ];
+
   // Variante determinista por semana del año: misma semana => mismo entreno.
   function weekNo(d){ const t=new Date(d.getFullYear(),d.getMonth(),d.getDate()); const s=new Date(t.getFullYear(),0,1); return Math.floor(((t-s)/86400000 + s.getDay())/7); }
   // Escalado según la intensidad elegida en el perfil
@@ -707,12 +816,25 @@
     else o.reps=Math.max(4, Math.round(ex.reps*cfg.vol));
     return o;
   }
-  function wkOf(key){ const d=new Date(key+'T00:00:00'); const day=d.getDay(); const W=WORKOUTS[day];
-    const vi=W.variants.length?((weekNo(d)%W.variants.length)+W.variants.length)%W.variants.length:0; const v=W.variants[vi];
-    const cfg=INTENS[(S.profile&&S.profile.intens)||'normal']||INTENS.normal;
+  function defaultPick(key){ const d=new Date(key+'T00:00:00'); const day=d.getDay(); const W=WORKOUTS[day];
+    const vi=W.variants.length?((weekNo(d)%W.variants.length)+W.variants.length)%W.variants.length:0; return {d:day,v:vi}; }
+  // Construye el entreno de una fecha, respetando el cambio manual y la intensidad de ese día
+  function wkOf(key){
+    const rec=S.days[key];                       // lectura directa: evita recursión con dayRec
+    const def=defaultPick(key);
+    const swapped = !!(rec&&rec.wp);
+    const day = swapped?rec.wp.d:def.d, vi = swapped?rec.wp.v:def.v;
+    const W=WORKOUTS[day]||WORKOUTS[def.d];
+    const v=W.variants[vi]||W.variants[0];
+    const lvl=(rec&&rec.wi)||(S.profile&&S.profile.intens)||'normal';
+    const cfg=INTENS[lvl]||INTENS.normal;
     const ex=v.ex.map(e=>scaleEx(e,cfg));
     const inten=Math.max(1,Math.min(5, W.intensity + (cfg.sets>0?1:(cfg.sets<0?-1:0))));
-    return {day:day, vi:vi, tag:W.tag, intensity:inten, baseIntensity:W.intensity, title:v.title, ex:ex, nv:W.variants.length, ilbl:cfg.lbl}; }
+    return {day:day, vi:vi, tag:W.tag, intensity:inten, baseIntensity:W.intensity, title:v.title, ex:ex,
+            nv:W.variants.length, ilbl:cfg.lbl, lvl:lvl, swapped:swapped, dayIntens:!!(rec&&rec.wi)}; }
+  // duración estimada de cualquier variante con una intensidad dada (para el selector)
+  function previewMin(dayIdx,vi,lvl){ const cfg=INTENS[lvl]||INTENS.normal;
+    return estMinutes({ex:WORKOUTS[dayIdx].variants[vi].ex.map(e=>scaleEx(e,cfg))}); }
   function wkToday(){ return wkOf(todayKey()); }
 
   /* ===== MEALS con ingredientes ===== */
@@ -957,7 +1079,8 @@
   function renderEntreno(){
     const isT=(wSel==='tomorrow'), key=wKey(), w=wkOf(key), rec=dayRec(key);
     document.querySelectorAll('#wSeg button').forEach(b=>b.classList.toggle('on',b.dataset.w===wSel));
-    document.getElementById('workoutTag').textContent=w.tag+' · Var. '+'ABC'[w.vi]+' · '+w.ilbl;
+    document.getElementById('workoutTag').innerHTML=w.tag+' · Var. '+'ABC'[w.vi]+' · '+w.ilbl+
+      (w.swapped?' <span class="swapped">cambiado</span>':'')+(w.dayIntens?' <span class="swapped">solo hoy</span>':'');
     document.getElementById('workoutTitle').textContent=w.title;
     document.getElementById('metaEx').textContent=w.ex.length;
     document.getElementById('metaTime').textContent=estMinutes(w)+' min';
@@ -1374,6 +1497,66 @@
     document.getElementById('pPause').querySelector('span').textContent=sPaused?'Seguir':'Pausa'; });
   document.getElementById('pSkip').addEventListener('click',advance);
   document.getElementById('pClose').addEventListener('click',()=>{ if(confirm('¿Salir del entrenamiento? Se guarda lo que ya has completado.')) closePlayer(); });
+
+  /* ===== CAMBIAR ENTRENO ===== */
+  let wswapKey=null, wswapLvl='normal';
+  function openWSwap(key){
+    wswapKey=key;
+    const cur=wkOf(key), def=defaultPick(key);
+    wswapLvl=cur.lvl;
+    const rec=S.days[key];
+    const doneN=rec?rec.ex.filter(Boolean).length:0;
+    document.getElementById('wswapLede').textContent = doneN>0
+      ? 'Ojo: ya llevas '+doneN+' ejercicio'+(doneN>1?'s':'')+' marcado'+(doneN>1?'s':'')+'; al cambiar se reinicia.'
+      : 'Elige otra sesión solo para este día.';
+    document.querySelectorAll('#wswapInt button').forEach(b=>b.classList.toggle('on',b.dataset.i===wswapLvl));
+    paintWSwap();
+    document.getElementById('wswapBg').classList.add('open');
+    document.getElementById('wswapSheet').classList.add('open');
+  }
+  function paintWSwap(){
+    const cur=wkOf(wswapKey), def=defaultPick(wswapKey);
+    const box=document.getElementById('wswapList'); box.innerHTML='';
+    WORKOUTS.forEach((W,di)=>{
+      const grp=document.createElement('div'); grp.className='wgrp';
+      grp.innerHTML='<div class="wgrp-t">'+W.tag.split(' · ')[0]+'</div>';
+      W.variants.forEach((v,vi)=>{
+        const isCur=(di===cur.day&&vi===cur.vi), isDef=(di===def.d&&vi===def.v);
+        const mins=previewMin(di,vi,wswapLvl);
+        const el=document.createElement('button'); el.className='swapopt'+(isCur?' sel':'');
+        el.innerHTML='<div class="so-top"><span class="so-n">'+v.title+'</span>'+(isDef?'<span class="so-def">de hoy</span>':'')+'</div>'+
+          '<div class="so-ing">'+v.ex.length+' ejercicios · '+mins+' min · '+['','muy suave','suave','moderado','exigente','máximo'][W.intensity]+'</div>';
+        el.addEventListener('click',()=>{ vibe(12);
+          const r=dayRec(wswapKey);
+          r.wp = (di===def.d&&vi===def.v) ? null : {d:di,v:vi};
+          r.wi = (wswapLvl===((S.profile&&S.profile.intens)||'normal')) ? null : wswapLvl;
+          const nw=wkOf(wswapKey);
+          if(!Array.isArray(r.ex)||r.ex.length!==nw.ex.length) r.ex=new Array(nw.ex.length).fill(false);
+          save(); closeWSwap(); renderEntreno(); renderElevation(); renderHeader(); toast('Entreno cambiado');
+        });
+        grp.appendChild(el);
+      });
+      box.appendChild(grp);
+    });
+  }
+  function closeWSwap(){ document.getElementById('wswapBg').classList.remove('open'); document.getElementById('wswapSheet').classList.remove('open'); }
+  document.getElementById('wswapBg').addEventListener('click',closeWSwap);
+  document.getElementById('wswapClose').addEventListener('click',closeWSwap);
+  document.getElementById('wSwapBtn').addEventListener('click',()=>{ vibe(12); openWSwap(wKey()); });
+  document.querySelectorAll('#wswapInt button').forEach(b=>b.addEventListener('click',()=>{
+    wswapLvl=b.dataset.i;
+    document.querySelectorAll('#wswapInt button').forEach(x=>x.classList.remove('on')); b.classList.add('on');
+    // aplicar la intensidad al día sin cerrar la hoja
+    const r=dayRec(wswapKey);
+    r.wi=(wswapLvl===((S.profile&&S.profile.intens)||'normal'))?null:wswapLvl;
+    const nw=wkOf(wswapKey);
+    if(!Array.isArray(r.ex)||r.ex.length!==nw.ex.length) r.ex=new Array(nw.ex.length).fill(false);
+    save(); paintWSwap(); renderEntreno();
+  }));
+  document.getElementById('wswapReset').addEventListener('click',()=>{
+    if(wswapKey==null) return; const r=dayRec(wswapKey); r.wp=null; r.wi=null;
+    const nw=wkOf(wswapKey); if(r.ex.length!==nw.ex.length) r.ex=new Array(nw.ex.length).fill(false);
+    save(); closeWSwap(); renderEntreno(); renderElevation(); renderHeader(); toast('Entreno restaurado'); });
 
   /* ===== CAMBIAR COMIDA ===== */
   let swapKey=null, swapSlot=0;
