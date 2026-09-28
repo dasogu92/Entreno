@@ -1,5 +1,5 @@
-/* RECOMP service worker — offline app shell + runtime cache */
-const CACHE = 'recomp-v12';
+/* mamadoFit service worker — offline app shell + runtime cache */
+const CACHE = 'mamadofit-v4';
 const ASSETS = [
   './',
   './index.html',

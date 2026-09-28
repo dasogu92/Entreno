@@ -3,12 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no">
-<title>RECOMP</title>
+<title>mamadoFit</title>
 <meta name="theme-color" content="#0e1012">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="RECOMP">
+<meta name="apple-mobile-web-app-title" content="mamadoFit">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
@@ -48,7 +48,8 @@
   .bib::before,.bib::after{content:"";position:absolute;top:6px;width:6px;height:6px;border-radius:50%;background:var(--ink);opacity:.35;}
   .bib::before{left:7px;} .bib::after{right:7px;}
   .bib .num{font-family:'Archivo';font-weight:900;font-size:30px;} .bib .cap{font-size:8px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;margin-top:1px;opacity:.6;}
-  .brand h1{font-family:'Archivo';font-weight:900;font-size:30px;margin:0;line-height:.9;letter-spacing:-.01em;}
+  .brand h1{font-family:'Archivo';font-weight:900;font-size:27px;margin:0;line-height:.9;letter-spacing:-.02em;}
+  .brand h1 .fit{color:var(--effort);}
   .brand .date{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.09em;margin-top:5px;font-weight:600;}
   .gear{width:42px;height:42px;border-radius:11px;border:1px solid var(--line);background:var(--panel);color:var(--muted);display:flex;align-items:center;justify-content:center;}
   .gear:active{transform:scale(.94);} .gear svg{width:20px;height:20px;}
@@ -211,7 +212,39 @@
   .mrow .mv{font-family:'JetBrains Mono';font-size:15px;color:var(--sky);font-weight:700;}
   .mrow .md{font-family:'JetBrains Mono';font-size:12.5px;font-weight:700;min-width:48px;text-align:right;}
 
-  /* copia de seguridad */
+  /* barra de instalación */
+  .install-bar{position:fixed;top:0;left:0;right:0;z-index:40;display:none;align-items:center;gap:12px;
+    padding:calc(10px + env(safe-area-inset-top)) 14px 10px;background:rgba(22,25,28,.96);
+    backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid var(--line);
+    animation:slideDown .45s cubic-bezier(.2,.8,.3,1);}
+  .install-bar.show{display:flex;}
+  @keyframes slideDown{from{transform:translateY(-100%);}to{transform:translateY(0);}}
+  body.has-bar{padding-top:72px;}
+  .ib-icon img{width:40px;height:40px;border-radius:10px;display:block;}
+  .ib-txt{flex:1;min-width:0;display:flex;flex-direction:column;}
+  .ib-txt b{font-size:13.5px;font-weight:700;line-height:1.2;}
+  .ib-txt span{font-size:11px;color:var(--muted);line-height:1.3;margin-top:2px;}
+  .ib-btn{background:var(--effort);border:none;color:var(--ink);font-weight:800;font-size:13px;
+    padding:10px 16px;border-radius:10px;flex-shrink:0;}
+  .ib-btn:active{transform:scale(.95);}
+  .ib-x{background:none;border:none;color:var(--muted2);font-size:15px;padding:6px;flex-shrink:0;}
+
+  /* instrucciones de instalación */
+  .ios-head{display:flex;align-items:center;gap:14px;margin-bottom:20px;}
+  .ios-icon{width:52px;height:52px;border-radius:13px;flex-shrink:0;}
+  .istep{display:flex;gap:13px;align-items:flex-start;padding:13px 0;border-bottom:1px solid var(--line);}
+  .istep:last-child{border-bottom:none;}
+  .istep .in{width:26px;height:26px;border-radius:50%;background:var(--effort);color:var(--ink);
+    font-family:'Archivo';font-weight:900;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .istep b{display:block;font-size:14px;margin-bottom:3px;}
+  .istep span{font-size:12.5px;color:var(--muted);line-height:1.45;}
+
+  /* barra de instalación */
+.acc-card{padding:16px;margin:4px 0 14px;}
+  .acc-card .lede{font-size:12.5px;margin-bottom:12px;}
+  .acc-card input{width:100%;background:var(--panel2);border:1px solid var(--line);color:var(--text);border-radius:10px;padding:12px 14px;font-size:14.5px;}
+  .acc-msg{font-size:12px;color:var(--muted);margin:10px 0 0;min-height:1px;}
+  .acc-msg.warn{color:var(--gold);} .acc-msg.ok{color:var(--done);}
   .backup-row{display:flex;gap:9px;margin-top:14px;}
   .btn-sec{flex:1;background:var(--panel2);border:1px solid var(--line2);color:var(--text);font-weight:700;font-size:13px;padding:12px;border-radius:11px;}
   .btn-sec:active{transform:scale(.97);border-color:var(--sky);}
@@ -327,14 +360,102 @@
   } .p-done .big{font-family:'Archivo';font-weight:900;font-size:44px;color:var(--done);line-height:1;margin-bottom:10px;}
   .p-done p{color:var(--muted);font-size:15px;margin:0 0 26px;}
   .p-progress{height:5px;border-radius:99px;background:var(--panel3);margin-top:14px;overflow:hidden;} .p-progress i{display:block;height:100%;background:var(--effort);transition:width .3s;} .player.rest .p-progress i{background:var(--done);}
+
+  /* ====== VISOR DE EJERCICIO ====== */
+  .demo-dot{display:inline-flex;align-items:center;justify-content:center;width:17px;height:17px;border-radius:50%;
+    background:var(--panel3);border:1px solid var(--line2);color:var(--sky);font-size:10px;font-weight:800;
+    vertical-align:middle;margin-left:5px;cursor:pointer;}
+  .demo-dot:active{transform:scale(.88);background:var(--sky);color:var(--ink);}
+  .demo-dot.big{width:26px;height:26px;font-size:14px;margin-left:8px;}
+  .demo-stage{background:#f3f4ef;border-radius:14px;overflow:hidden;margin:4px 0 16px;position:relative;}
+  .demo-frames{position:relative;width:100%;aspect-ratio:4/3;}
+  .demo-frames .df{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+  .demo-frames .f0{animation:fr0 2.2s steps(1,end) infinite;}
+  .demo-frames .f1{animation:fr1 2.2s steps(1,end) infinite;}
+  @keyframes fr0{0%,50%{opacity:1;}50.01%,100%{opacity:0;}}
+  @keyframes fr1{0%,50%{opacity:0;}50.01%,100%{opacity:1;}}
+  .demo-tag{position:absolute;bottom:8px;right:8px;background:rgba(14,16,18,.75);color:var(--text);
+    font-size:9.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:4px 9px;border-radius:99px;}
+  .demo-cue{font-size:14px;line-height:1.5;color:var(--text);margin:0 0 14px;}
+  .demo-meta{margin-bottom:16px;}
+
+  /* ====== BOTÓN QUITAR ====== */
+  .exlog .ex-name{flex:1;min-width:0;padding-right:10px;}
+  .exlog .rm{display:inline-flex;align-items:center;gap:6px;background:var(--panel3);border:1px solid var(--line2);
+    color:var(--muted);font-size:11.5px;font-weight:700;padding:7px 12px;border-radius:9px;flex-shrink:0;}
+  .exlog .rm svg{width:13px;height:13px;}
+  .exlog .rm:active{background:var(--effort);color:var(--ink);border-color:var(--effort);transform:scale(.95);}
+
+  /* ====== ANILLOS ====== */
+  .dd-rings{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+  .mring svg{width:64px;height:64px;transform:rotate(-90deg);}
+  .mring .mr-val{position:absolute;top:23px;font-family:'Archivo';font-weight:800;font-size:15px;line-height:1;}
+  .mring .mr-lbl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;font-weight:700;margin-top:5px;}
+
+  /* ====== SUBIDA DE CONTRASTE Y VIDA VISUAL ====== */
+  :root{ --glow-eff:rgba(255,90,31,.35); --glow-done:rgba(194,230,37,.3); }
+  /* tarjetas con volumen en vez de gris plano */
+  .card{background:linear-gradient(168deg,#1c2126 0%,#15181b 100%);
+    box-shadow:0 1px 0 rgba(255,255,255,.05) inset, 0 6px 20px rgba(0,0,0,.28);}
+  .profile-card{background:linear-gradient(168deg,#1e2329 0%,#15181b 100%);
+    box-shadow:0 1px 0 rgba(255,255,255,.06) inset, 0 8px 26px rgba(0,0,0,.34);}
+  /* cifras grandes con degradado */
+  .stat.a .n{background:linear-gradient(135deg,#ff8a1f,#ff3d00);-webkit-background-clip:text;background-clip:text;color:transparent;}
+  .stat.b .n{background:linear-gradient(135deg,#d4ff3d,#8fc400);-webkit-background-clip:text;background-clip:text;color:transparent;}
+  .stat.c .n{background:linear-gradient(135deg,#ffd23d,#f4a300);-webkit-background-clip:text;background-clip:text;color:transparent;}
+  .macro .n.eff{background:linear-gradient(135deg,#ff8a1f,#ff3d00);-webkit-background-clip:text;background-clip:text;color:transparent;}
+  .macro .n.gr{background:linear-gradient(135deg,#d4ff3d,#8fc400);-webkit-background-clip:text;background-clip:text;color:transparent;}
+  .macro .n.sk{background:linear-gradient(135deg,#7ae0f5,#2ba7c7);-webkit-background-clip:text;background-clip:text;color:transparent;}
+  /* botón principal con degradado y brillo */
+  .startbtn{background:linear-gradient(135deg,#ff8a1f,#ff3d00);}
+  .startbtn.resume{background:linear-gradient(135deg,#ffd23d,#f4a300);}
+  /* dorsal de la racha con más presencia */
+  .bib{box-shadow:0 6px 20px rgba(0,0,0,.5), 0 0 0 1px rgba(255,255,255,.08);}
+  .bib .num{background:linear-gradient(135deg,#ff8a1f,#ff3d00);-webkit-background-clip:text;background-clip:text;color:transparent;}
+  /* barra de progreso más viva */
+  .prog{background:rgba(255,255,255,.07);}
+  .prog i{box-shadow:0 0 10px var(--glow-eff);}
+  /* check marcado con brillo */
+  .row.on .chk,.meal-card.on .chk{box-shadow:0 0 10px var(--glow-done);}
+  /* pestaña activa con halo */
+  nav.bottom .navbtn.active svg{filter:drop-shadow(0 0 6px var(--glow-eff));}
+  nav.bottom .navbtn::after{box-shadow:0 0 8px var(--glow-eff);}
+  /* texto un punto más claro */
+  .card .lede,.eyebrow{color:#9aa3ac;}
+  .row .meta,.mring .mr-lbl,.macro .l,.stat .l{color:#98a1aa;}
+  /* línea del perfil de etapa más marcada */
+  .elev svg path[stroke]{filter:drop-shadow(0 2px 6px rgba(255,90,31,.35));}
+
+  /* el visor debe quedar por encima del reproductor a pantalla completa */
+  #demoBg{z-index:64;} #demoSheet{z-index:65;}
+  .toast{z-index:80;}
 </style>
 </head>
 <body>
+<div class="install-bar" id="installBar">
+  <div class="ib-icon"><img src="icon-192.png" alt=""></div>
+  <div class="ib-txt"><b>Instala mamadoFit</b><span id="ibSub">Tenla como app, funciona sin conexión</span></div>
+  <button class="ib-btn" id="installBtn">Instalar</button>
+  <button class="ib-x" id="installClose" aria-label="Ahora no">✕</button>
+</div>
+
+<div class="sheet-bg" id="iosBg"></div>
+<div class="sheet" id="iosSheet">
+  <div class="grab"></div>
+  <div class="ios-head">
+    <img src="icon-192.png" alt="" class="ios-icon">
+    <div><h3 style="margin:0 0 3px;">Añadir a la pantalla de inicio</h3>
+    <p class="lede" style="margin:0;" id="iosLede">Tres pasos y la tendrás como una app más.</p></div>
+  </div>
+  <div id="iosSteps"></div>
+  <button class="save-profile" id="iosOk">Entendido</button>
+</div>
+
 <div class="app">
   <header class="top">
     <div class="brand">
       <div class="bib"><span class="num" id="streakNum">0</span><span class="cap">Racha</span></div>
-      <div><h1 class="cond">RECOMP</h1><div class="date" id="todayDate">—</div></div>
+      <div><h1 class="cond">mamado<span class="fit">Fit</span></h1><div class="date" id="todayDate">—</div></div>
     </div>
     <button class="gear" id="openProfile" aria-label="Perfil">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
@@ -506,6 +627,29 @@
     <div class="field"><label>Intensidad del entreno</label><div class="seg" id="pInt"><button data-i="soft">Suave</button><button data-i="normal" class="on">Normal</button><button data-i="hard">Intenso</button></div>
       <p class="note" id="intNote" style="margin-top:8px;">Normal: el plan tal cual. Suave baja series y sube descansos; Intenso añade series y recorta descansos.</p></div>
     <button class="save-profile" id="saveProfile">Guardar perfil</button>
+    <div class="card acc-card" id="accountCard" style="display:none;">
+      <div class="eyebrow sky"><span class="dot"></span><span>Tu cuenta</span></div>
+      <div id="accAnon">
+        <h2 style="font-size:19px;">Guarda tus datos</h2>
+        <p class="lede">Con una cuenta tu historial se guarda en la nube y no se pierde aunque cambies de móvil.</p>
+        <div class="field" style="margin-bottom:10px;"><input type="email" id="accEmailIn" placeholder="tu@correo.com" autocomplete="email"></div>
+        <div class="field" style="margin-bottom:12px;"><input type="password" id="accPassIn" placeholder="Contraseña" autocomplete="current-password"></div>
+        <div class="backup-row" style="margin-top:0;">
+          <button class="btn-sec" id="accUp">Crear cuenta</button>
+          <button class="save-profile" id="accIn" style="margin-top:0;flex:1;padding:12px;font-size:14px;">Entrar</button>
+        </div>
+      </div>
+      <div id="accLogged" style="display:none;">
+        <h2 style="font-size:19px;" id="accEmail">—</h2>
+        <p class="lede" id="accSync">Sin sincronizar todavía</p>
+        <div class="backup-row" style="margin-top:0;">
+          <button class="btn-sec" id="accNow">Sincronizar ahora</button>
+          <button class="btn-sec" id="accOut">Cerrar sesión</button>
+        </div>
+      </div>
+      <p class="acc-msg" id="accMsg"></p>
+    </div>
+    <button class="btn-sec" id="installFromProfile" style="width:100%;margin-top:4px;display:none;">Instalar app en el móvil</button>
     <div class="backup-row">
       <button class="btn-sec" id="exportData">Exportar copia</button>
       <button class="btn-sec" id="importData">Importar copia</button>
@@ -552,6 +696,16 @@
     <button class="danger" id="swapClose">Cerrar</button>
   </div>
   <div class="toast" id="toast">Guardado</div>
+</div>
+
+<div class="sheet-bg" id="demoBg"></div>
+<div class="sheet" id="demoSheet">
+<div class="grab"></div>
+  <h3 id="demoTitle">Ejercicio</h3>
+<div class="demo-stage" id="demoStage"></div>
+  <p class="demo-cue" id="demoCue"></p>
+<div id="demoMeta" class="demo-meta"></div>
+  <button class="save-profile" id="demoOk">Entendido</button>
 </div>
 
 <!-- PLAYER -->
@@ -907,6 +1061,154 @@
     ]
   };
 
+  /* ===== DEMOSTRACIONES DE EJERCICIO (free-exercise-db, dominio público) ===== */
+  const EXDB='https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/';
+  const EXDB_ALT='https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/';
+  const EXDEMO={
+    'Apertura de pecho con banda':'Bodyweight_Flyes',
+    'Aperturas con mancuernas':'Dumbbell_Flyes',
+    'Aperturas inclinadas':'Incline_Dumbbell_Flyes',
+    'Buenos días con mancuerna':'Good_Morning',
+    'Comba o carrera en el sitio':'Rope_Jumping',
+    'Core: dead bug y superman':'Superman',
+    'Core: plancha o rueda abdominal':'Plank',
+    'Core: plancha y crunch':'Plank',
+    'Crunch y elevación de piernas':'Flat_Bench_Lying_Leg_Raise',
+    'Curl concentrado':'Concentration_Curls',
+    'Curl de bíceps':'Dumbbell_Bicep_Curl',
+    'Curl de bíceps a una mano':'Concentration_Curls',
+    'Curl femoral con banda':'Lying_Leg_Curls',
+    'Curl inverso':'Standing_Dumbbell_Reverse_Curl',
+    'Curl martillo':'Hammer_Curls',
+    'Elevaciones laterales':'Side_Lateral_Raise',
+    'Elevación de gemelos':'Calf_Raise_On_A_Dumbbell',
+    'Elevación frontal':'Front_Dumbbell_Raise',
+    'Encogimientos de hombros':'Dumbbell_Shrug',
+    'Escaladores rápidos':'Mountain_Climbers',
+    'Extensión de tríceps sobre cabeza':'Dumbbell_One-Arm_Triceps_Extension',
+    'Face pull con banda':'Face_Pull',
+    'Flexiones':'Pushups',
+    'Flexiones con apoyo alterno':'Clock_Push-Up',
+    'Flexiones con pies elevados':'Decline_Push-Up',
+    'Flexiones diamante':'Close-Grip_Push-Up_off_of_a_Dumbbell',
+    'Flexiones lastradas o lentas':'Pushups',
+    'Fondos en banco':'Bench_Dips',
+    'Fondos en banco o silla':'Bench_Dips',
+    'Fondos entre sillas':'Bench_Dips',
+    'Gemelo a una pierna':'Calf_Raise_On_A_Dumbbell',
+    'Mountain climbers':'Mountain_Climbers',
+    'Patada de tríceps':'Tricep_Dumbbell_Kickback',
+    'Peso muerto a una pierna':'Stiff-Legged_Dumbbell_Deadlift',
+    'Peso muerto rumano':'Romanian_Deadlift',
+    'Peso muerto rumano con mancuernas':'Romanian_Deadlift',
+    'Plancha con toque de hombro':'Plank',
+    'Plancha dinámica':'Plank',
+    'Plancha frontal':'Plank',
+    'Plancha frontal y lateral':'Plank',
+    'Plancha lateral':'Push_Up_to_Side_Plank',
+    'Plancha lateral con elevación':'Push_Up_to_Side_Plank',
+    'Plancha suave y respiración':'Plank',
+    'Press Arnold con mancuernas':'Arnold_Dumbbell_Press',
+    'Press banca con mancuernas':'Dumbbell_Bench_Press',
+    'Press de hombro':'Dumbbell_Shoulder_Press',
+    'Press de hombro con banda':'Dumbbell_Shoulder_Press',
+    'Press inclinado con mancuernas':'Incline_Dumbbell_Bench_With_Palms_Facing_In',
+    'Press militar':'Dumbbell_Shoulder_Press',
+    'Press militar de pie':'Dumbbell_Shoulder_Press',
+    'Puente de glúteo':'Barbell_Glute_Bridge',
+    'Puente de glúteo a una pierna':'Single_Leg_Glute_Bridge',
+    'Pull-over con banda':'Straight-Arm_Dumbbell_Pullover',
+    'Pull-over con mancuerna':'Straight-Arm_Dumbbell_Pullover',
+    'Pájaros (deltoide posterior)':'Seated_Bent-Over_Rear_Delt_Raise',
+    'Remo bajo con banda':'Seated_Cable_Rows',
+    'Remo con banda':'Seated_Cable_Rows',
+    'Remo con banda elástica':'Seated_Cable_Rows',
+    'Remo con dos mancuernas':'Bent_Over_Two-Dumbbell_Row',
+    'Remo con mancuerna':'One-Arm_Dumbbell_Row',
+    'Remo inclinado a dos manos':'Bent_Over_Two-Dumbbell_Row',
+    'Remo mancuerna a una mano':'One-Arm_Dumbbell_Row',
+    'Remo mancuerna a una mano lento':'One-Arm_Dumbbell_Row',
+    'Remo renegado':'Alternating_Renegade_Row',
+    'Remo renegado con mancuernas':'Alternating_Renegade_Row',
+    'Russian twist':'Russian_Twist',
+    'Sentadilla búlgara':'Dumbbell_Rear_Lunge',
+    'Sentadilla con mancuernas':'Dumbbell_Squat',
+    'Sentadilla con salto':'Freehand_Jump_Squat',
+    'Sentadilla frontal con mancuernas':'Dumbbell_Squat',
+    'Sentadilla goblet':'Goblet_Squat',
+    'Sentadilla goblet lenta':'Goblet_Squat',
+    'Sentadilla isométrica':'Bodyweight_Squat',
+    'Sentadilla isométrica en pared':'Bodyweight_Squat',
+    'Sentadilla sumo con mancuerna':'Dumbbell_Squat_To_A_Bench',
+    'Step-up a silla':'Step-up_with_Knee_Raise',
+    'Step-up con mancuernas':'Step-up_with_Knee_Raise',
+    'Superman':'Superman',
+    'Superman y dead bug':'Superman',
+    'Swing con mancuerna':'One-Arm_Kettlebell_Swings',
+    'Thruster con mancuernas':'Kettlebell_Thruster',
+    'Zancada caminando':'Bodyweight_Walking_Lunge',
+    'Zancada estática':'Dumbbell_Lunges',
+    'Zancadas alternas':'Dumbbell_Lunges',
+    'Zancadas alternas rápidas':'Dumbbell_Lunges',
+    'Zancadas con salto':'Freehand_Jump_Squat',
+    'Zancadas isométricas':'Bodyweight_Walking_Lunge'
+  };
+  const EXCUE={
+    'Alternating_Renegade_Row':'En plancha con mancuernas. Aprieta el abdomen para que no gire la cadera.',
+    'Arnold_Dumbbell_Press':'Empieza con las palmas hacia ti y gíralas mientras subes. Movimiento lento.',
+    'Barbell_Glute_Bridge':'Aprieta el glúteo arriba y aguanta. No arquees la zona lumbar.',
+    'Bench_Dips':'Codos hacia atrás, no hacia fuera. Baja hasta 90° y no más para cuidar el hombro.',
+    'Bent_Over_Two-Dumbbell_Row':'Tronco inclinado unos 45°, espalda plana. Junta los omóplatos arriba.',
+    'Bodyweight_Flyes':'Abre los brazos contra la resistencia de la banda y junta delante del pecho.',
+    'Bodyweight_Squat':'Contra la pared, muslos paralelos al suelo. Aguanta sin despegar la espalda.',
+    'Bodyweight_Walking_Lunge':'Avanza dando pasos largos. Controla el equilibrio antes de subir el ritmo.',
+    'Calf_Raise_On_A_Dumbbell':'Sube lo máximo de puntillas y baja despacio hasta estirar el gemelo.',
+    'Clock_Push-Up':'Alterna el apoyo de una mano adelantada en cada repetición.',
+    'Close-Grip_Push-Up_off_of_a_Dumbbell':'Manos juntas bajo el pecho. Codos pegados al cuerpo: es tríceps puro.',
+    'Concentration_Curls':'Codo apoyado en el muslo. Aísla el bíceps, imposible hacer trampa.',
+    'Decline_Push-Up':'Pies elevados sobre una silla. Cuanto más altos, más carga en el hombro.',
+    'Dumbbell_Bench_Press':'Baja controlando hasta que el codo quede algo por debajo del hombro. No rebotes en el pecho.',
+    'Dumbbell_Bicep_Curl':'Codos quietos pegados al cuerpo. Sin balanceo, baja despacio.',
+    'Dumbbell_Flyes':'Codos ligeramente flexionados y fijos. Abre solo hasta notar estiramiento, sin forzar.',
+    'Dumbbell_Lunges':'Baja hasta que la rodilla de atrás casi roce el suelo. Tronco vertical.',
+    'Dumbbell_One-Arm_Triceps_Extension':'Codo apuntando al techo y pegado a la cabeza. Solo se mueve el antebrazo.',
+    'Dumbbell_Rear_Lunge':'Pie trasero elevado en una silla. Casi todo el peso en la pierna delantera.',
+    'Dumbbell_Shoulder_Press':'Aprieta el abdomen para no arquear la espalda. Sube sin bloquear del todo el codo.',
+    'Dumbbell_Shrug':'Sube los hombros hacia las orejas. Sin girarlos: es subir y bajar.',
+    'Dumbbell_Squat':'Mancuernas a los lados. Rodillas siguiendo la dirección de los pies.',
+    'Dumbbell_Squat_To_A_Bench':'Pies más abiertos y puntas hacia fuera. Trabaja más el interior del muslo.',
+    'Face_Pull':'Tira hacia la cara separando las manos. Ideal para compensar tanto empuje.',
+    'Flat_Bench_Lying_Leg_Raise':'Lumbar pegada al suelo todo el rato. Baja las piernas sin tocar el suelo.',
+    'Freehand_Jump_Squat':'Cae siempre con la rodilla flexionada, nunca con la pierna rígida.',
+    'Front_Dumbbell_Raise':'Sube hasta la altura de los ojos. Sin balancear el tronco.',
+    'Goblet_Squat':'Mancuerna pegada al pecho. Baja entre las rodillas con el talón clavado.',
+    'Good_Morning':'Cadera atrás y espalda recta. Baja solo hasta donde mantengas la curva lumbar.',
+    'Hammer_Curls':'Palmas enfrentadas todo el recorrido. Trabaja más el antebrazo.',
+    'Incline_Dumbbell_Bench_With_Palms_Facing_In':'Banco a unos 30-45°. Más inclinación trabaja hombro en vez de pecho.',
+    'Incline_Dumbbell_Flyes':'Mismo gesto que la apertura plana, pero en banco inclinado. Peso moderado.',
+    'Kettlebell_Thruster':'Sentadilla y, al subir, aprovecha el impulso para empujar sobre la cabeza.',
+    'Lying_Leg_Curls':'Lleva el talón al glúteo contra la resistencia de la banda.',
+    'Mountain_Climbers':'Posición de flexión, lleva las rodillas al pecho alternando rápido.',
+    'One-Arm_Dumbbell_Row':'Tira llevando el codo hacia la cadera, no hacia fuera. Espalda recta.',
+    'One-Arm_Kettlebell_Swings':'El impulso sale de la cadera, no de los brazos. La mancuerna solo acompaña.',
+    'Plank':'Cadera ni alta ni hundida. Aprieta abdomen y glúteo, respira normal.',
+    'Push_Up_to_Side_Plank':'De lado, apoyado en antebrazo y pies. Cadera bien alta.',
+    'Pushups':'Cuerpo en línea recta de cabeza a talones. Codos a unos 45° del tronco.',
+    'Romanian_Deadlift':'Piernas casi rectas, cadera hacia atrás. Notarás el estiramiento detrás del muslo.',
+    'Rope_Jumping':'Salta bajo y rápido, con las muñecas. Amortigua con el antepié.',
+    'Russian_Twist':'Sentado, tronco atrás y gira de lado a lado llevando las manos al suelo.',
+    'Seated_Bent-Over_Rear_Delt_Raise':'Tronco inclinado, abre los brazos en cruz. Peso ligero, es un músculo pequeño.',
+    'Seated_Cable_Rows':'Tira con la espalda, no con los brazos. Pecho fuera y hombros abajo.',
+    'Side_Lateral_Raise':'Sube hasta la altura del hombro, no más. Codo ligeramente doblado y sin impulso.',
+    'Single_Leg_Glute_Bridge':'Una pierna estirada. Cadera nivelada, sin dejar caer un lado.',
+    'Standing_Dumbbell_Reverse_Curl':'Agarre con las palmas hacia abajo. Usa menos peso del que crees.',
+    'Step-up_with_Knee_Raise':'Sube empujando con el talón de la pierna de arriba, sin impulsarte con la de abajo.',
+    'Stiff-Legged_Dumbbell_Deadlift':'A una pierna: la libre va hacia atrás como contrapeso. Ve despacio.',
+    'Straight-Arm_Dumbbell_Pullover':'Brazos casi rectos. Baja por detrás de la cabeza hasta notar el estiramiento.',
+    'Superman':'Boca abajo, levanta brazos y piernas a la vez. Aguanta un segundo arriba.',
+    'Tricep_Dumbbell_Kickback':'Brazo pegado al costado. Extiende hacia atrás y aprieta arriba un segundo.'
+  };
+
   const SLOTS=['des','com','mer','cen'], SLOT_NAME=['Desayuno','Comida','Merienda','Cena'];
   // elección guardada por día; si no hay, el menú por defecto según el día de la semana
   function mealPick(key,i){
@@ -943,7 +1245,15 @@
   const DSHORT=['DOM','LUN','MAR','MIÉ','JUE','VIE','SÁB'];
   const GOAL_LABEL={recomp:'Recomp.',cut:'Definir',maintain:'Mantener'};
 
-  const KEY='recomp-store-v3';
+  /* ===== CONFIGURACIÓN DE LA NUBE (opcional) =====
+     Rellena estos dos valores con los de tu proyecto de Supabase para activar
+     cuentas y sincronización. Si los dejas vacíos, la app funciona en local igual que siempre. */
+  const SUPA_URL='';
+  const SUPA_KEY='';
+  const CLOUD_ON = !!(SUPA_URL && SUPA_KEY);
+
+  const KEY='mamadofit-store-v1';
+  const OLD_KEYS=['recomp-store-v3'];   // migración desde el nombre anterior
   let S={profile:{weight:null,height:null,age:null,sex:'m',goal:'recomp',intens:'normal'},days:{}};
 
   function pad(n){return String(n).padStart(2,'0');}
@@ -972,11 +1282,17 @@
     if(HAS_CLOUD){ try{ await window.storage.delete(KEY,false); return; }catch(e){} }
     try{ localStorage.removeItem(KEY); }catch(e){}
   }
-  async function load(){ try{const raw=await readStore(); if(raw) S=JSON.parse(raw);}catch(e){}
+  async function load(){
+    let raw=null; try{ raw=await readStore(); }catch(e){}
+    // si no hay datos con la clave nueva, recuperamos los del nombre anterior
+    if(!raw){ for(const k of OLD_KEYS){ try{ const old=localStorage.getItem(k);
+      if(old){ raw=old; await writeStore(old); break; } }catch(e){} } }
+    try{ if(raw) S=JSON.parse(raw); }catch(e){}
     if(!S.profile) S.profile={weight:null,height:null,age:null,sex:'m',goal:'recomp',intens:'normal'};
     if(!S.profile.sex) S.profile.sex='m'; if(!S.profile.intens) S.profile.intens='normal';
     if(!S.days) S.days={}; if(!Array.isArray(S.shop)) S.shop=[]; if(!S.loads) S.loads={}; if(!S.measures) S.measures={}; }
-  let st=null; function save(){ clearTimeout(st); st=setTimeout(()=>{ writeStore(JSON.stringify(S)); },120); }
+  let st=null; function save(){ clearTimeout(st); st=setTimeout(()=>{
+    S._ts=Date.now(); writeStore(JSON.stringify(S)); queuePush(); },120); }
 
   function bmr(){ const p=S.profile; if(!p.weight||!p.height||!p.age) return null;
     return 10*p.weight+6.25*p.height-5*p.age+(p.sex==='f'?-161:5); }
@@ -1035,12 +1351,17 @@
     renderDayDetail(pts[selDay]);
   }
   // anillo SVG compacto reutilizable
-  function miniRing(pct,color,big,small){
-    const R=22, C=2*Math.PI*R, off=C*(1-Math.max(0,Math.min(1,pct)));
+  let ringSeq=0;
+  function miniRing(pct,grad,big,small){
+    const R=25, C=2*Math.PI*R, p=Math.max(0,Math.min(1,pct)), off=C*(1-p);
+    const gid='rg'+(ringSeq++), G={eff:['#ff8a1f','#ff3d00'],done:['#d4ff3d','#8fc400'],gold:['#ffd23d','#f4a300'],mut:['#414a52','#2e353b']}[grad]||['#ff8a1f','#ff3d00'];
     return '<div class="mring">'+
-      '<svg viewBox="0 0 56 56"><circle cx="28" cy="28" r="'+R+'" fill="none" stroke="var(--panel3)" stroke-width="6"/>'+
-      '<circle class="mr-fill" cx="28" cy="28" r="'+R+'" fill="none" stroke="'+color+'" stroke-width="6" stroke-linecap="round" stroke-dasharray="'+C.toFixed(1)+'" stroke-dashoffset="'+off.toFixed(1)+'"/></svg>'+
-      '<span class="mr-val" style="color:'+color+'">'+big+'</span>'+
+      '<svg viewBox="0 0 64 64">'+
+      '<defs><linearGradient id="'+gid+'" x1="0" y1="0" x2="1" y2="1">'+
+      '<stop offset="0" stop-color="'+G[0]+'"/><stop offset="1" stop-color="'+G[1]+'"/></linearGradient></defs>'+
+      '<circle cx="32" cy="32" r="'+R+'" fill="none" stroke="rgba(255,255,255,.07)" stroke-width="7"/>'+
+      '<circle class="mr-fill" cx="32" cy="32" r="'+R+'" fill="none" stroke="url(#'+gid+')" stroke-width="7" stroke-linecap="round" stroke-dasharray="'+C.toFixed(1)+'" stroke-dashoffset="'+off.toFixed(1)+'" style="filter:drop-shadow(0 0 5px '+G[0]+'66)"/></svg>'+
+      '<span class="mr-val" style="color:'+G[0]+'">'+big+'</span>'+
       '<span class="mr-lbl">'+small+'</span></div>';
   }
   function renderDayDetail(p){
@@ -1049,17 +1370,17 @@
     const label=isToday?'Hoy':(selDay===5?'Ayer':p.d.toLocaleDateString('es-ES',{weekday:'long',day:'numeric',month:'short'}));
     const head='<div class="dd-head"><b>'+label+'</b><span>'+p.wk.title+'</span></div>';
     if(!r){ box.innerHTML=head+
-      '<div class="dd-rings">'+miniRing(0,'var(--effort)','0%','Entreno')+miniRing(0,'var(--done)','0/4','Comidas')+miniRing(1,'var(--muted2)','—','Excesos')+'</div>'; return; }
+      '<div class="dd-rings">'+miniRing(0,'eff','0%','Entreno')+miniRing(0,'done','0/4','Comidas')+miniRing(0,'mut','—','Excesos')+'</div>'; return; }
     const doneN=r.ex.filter(Boolean).length, tot=r.ex.length;
     const mealsN=r.meals.filter(Boolean).length;
     const drinks=r.drinks.reduce((s,x)=>s+x.q,0), extras=r.extras?r.extras.length:0;
     const total=debt(r), wB=Math.min(total,workoutBurn(r,p.wk)), covered=wB+(r.burned||0);
     const exPct=tot?doneN/tot:0;
-    let rings=miniRing(exPct,'var(--effort)',Math.round(exPct*100)+'%','Entreno');
-    rings+=miniRing(mealsN/4,'var(--done)',mealsN+'/4','Comidas');
+    let rings=miniRing(exPct,'eff',Math.round(exPct*100)+'%','Entreno');
+    rings+=miniRing(mealsN/4,'done',mealsN+'/4','Comidas');
     if(total>0){ const cp=Math.min(1,covered/total);
-      rings+=miniRing(cp,cp>=1?'var(--done)':'var(--gold)',cp>=1?'✓':Math.max(0,total-covered),'Pendiente'); }
-    else rings+=miniRing(1,'var(--done)','✓','Sin excesos');
+      rings+=miniRing(cp,cp>=1?'done':'gold',cp>=1?'✓':Math.max(0,total-covered),'Pendiente'); }
+    else rings+=miniRing(1,'done','✓','Sin excesos');
     let pills='';
     if(drinks) pills+='<span class="pill b">'+drinks+' bebidas</span>';
     if(extras) pills+='<span class="pill b">'+extras+' extra</span>';
@@ -1097,10 +1418,12 @@
     w.ex.forEach((ex,i)=>{ const row=document.createElement('div');row.className='row'+((!isT&&rec.ex[i])?' on':'');
       const detail=ex.mode==='time'?(ex.sets>1?ex.sets+'×'+mmss(ex.dur):mmss(ex.dur)):ex.sets+'×'+ex.reps;
       const showLoad = ex.mode==='reps';
+      const demo = hasDemo(ex.nm);
       row.innerHTML=(isT?'<span class="dotmark"></span>':'<button class="chk" aria-label="Marcar"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></button>')+
-        '<div class="body"><div class="nm">'+ex.nm+'</div>'+(showLoad?('<div class="exload">'+loadChip(ex.nm)+'</div>'):'')+'</div><div class="sets">'+detail+'</div>';
+        '<div class="body"><div class="nm">'+ex.nm+(demo?' <span class="demo-dot" aria-label="Ver cómo se hace">?</span>':'')+'</div>'+(showLoad?('<div class="exload">'+loadChip(ex.nm)+'</div>'):'')+'</div><div class="sets">'+detail+'</div>';
       if(!isT) row.querySelector('.chk').addEventListener('click',e=>{tap(e.currentTarget);rec.ex[i]=!rec.ex[i];save();renderEntreno();renderHeader();renderElevation();});
       const lb=row.querySelector('.loadbtn'); if(lb) lb.addEventListener('click',()=>{ vibe(12); openLoad(ex.nm); });
+      const dd=row.querySelector('.demo-dot'); if(dd) dd.addEventListener('click',e=>{ e.stopPropagation(); openDemo(ex.nm); });
       list.appendChild(row); });
   }
 
@@ -1209,11 +1532,13 @@
     // lista excesos
     const ul=document.getElementById('excessList'); ul.innerHTML='';
     rec.drinks.forEach(d=>{ const dr=DRINKS.find(x=>x.id===d.id); const li=document.createElement('li'); li.className='exlog';
-      li.innerHTML='<span>'+dr.ic+' '+dr.lb+' ×'+d.q+' · <span class="mono" style="color:var(--gold)">'+(dr.kcal*d.q)+' kcal</span></span><button class="rm" aria-label="Quitar">−</button>';
+      li.innerHTML='<span class="ex-name">'+dr.ic+' '+dr.lb+' ×'+d.q+' · <span class="mono" style="color:var(--gold)">'+(dr.kcal*d.q)+' kcal</span></span>'+
+        '<button class="rm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6M10 11v6M14 11v6"/></svg>Quitar</button>';
       li.querySelector('.rm').addEventListener('click',()=>{d.q--;if(d.q<=0)rec.drinks=rec.drinks.filter(x=>x.id!==d.id);const tk=debt(rec);if(rec.burned>tk)rec.burned=tk;save();renderCompensar();updateBadge();});
       ul.appendChild(li); });
     rec.extras.forEach((e,idx)=>{ const li=document.createElement('li'); li.className='exlog';
-      li.innerHTML='<span>'+e.ic+' '+e.name+' · <span class="mono" style="color:var(--gold)">'+e.kcal+' kcal</span></span><button class="rm" aria-label="Quitar">−</button>';
+      li.innerHTML='<span class="ex-name">'+e.ic+' '+e.name+' · <span class="mono" style="color:var(--gold)">'+e.kcal+' kcal</span></span>'+
+        '<button class="rm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6M10 11v6M14 11v6"/></svg>Quitar</button>';
       li.querySelector('.rm').addEventListener('click',()=>{rec.extras.splice(idx,1);const tk=debt(rec);if(rec.burned>tk)rec.burned=tk;save();renderCompensar();updateBadge();});
       ul.appendChild(li); });
     // ring — la factura ya descuenta lo que has entrenado ese día
@@ -1416,7 +1741,8 @@
       document.getElementById('pEx').textContent='¿Listo?';
       document.getElementById('pNext').innerHTML='Empieza: <b>'+ph.name+'</b>';
     } else {
-      document.getElementById('pEx').textContent=ph.name;
+      document.getElementById('pEx').innerHTML=ph.name+(hasDemo(ph.name)?' <span class="demo-dot big" id="pDemo">?</span>':'');
+      const pd=document.getElementById('pDemo'); if(pd) pd.addEventListener('click',()=>openDemo(ph.name));
       const pl=lastLoad(ph.name);
       document.getElementById('pNext').innerHTML='Serie <b>'+ph.set+' / '+ph.sets+'</b>'+
         (pl?(' &nbsp;·&nbsp; <span style="color:var(--sky)">última: '+pl.kg+' kg</span>'):'');
@@ -1497,6 +1823,225 @@
     document.getElementById('pPause').querySelector('span').textContent=sPaused?'Seguir':'Pausa'; });
   document.getElementById('pSkip').addEventListener('click',advance);
   document.getElementById('pClose').addEventListener('click',()=>{ if(confirm('¿Salir del entrenamiento? Se guarda lo que ya has completado.')) closePlayer(); });
+
+  /* ===== CUENTA Y SINCRONIZACIÓN EN LA NUBE ===== */
+  let sb=null, authSession=null, pushTimer=null, syncing=false;
+
+  async function initCloud(){
+    if(!CLOUD_ON) return;
+    try{
+      const m=await import('https://esm.sh/@supabase/supabase-js@2');
+      sb=m.createClient(SUPA_URL,SUPA_KEY,{auth:{persistSession:true,autoRefreshToken:true}});
+      const {data}=await sb.auth.getSession();
+      authSession=data.session||null;
+      sb.auth.onAuthStateChange((_e,s)=>{ authSession=s; renderAccount(); });
+      document.getElementById('accountCard').style.display='block';
+      renderAccount();
+      if(authSession) await pullRemote(true);
+    }catch(e){ console.log('nube no disponible',e); }
+  }
+
+  function setAccMsg(txt,kind){
+    const el=document.getElementById('accMsg'); if(!el) return;
+    el.textContent=txt||''; el.className='acc-msg'+(kind?(' '+kind):'');
+  }
+
+  function renderAccount(){
+    if(!CLOUD_ON) return;
+    const inn=document.getElementById('accLogged'), out=document.getElementById('accAnon');
+    if(authSession&&authSession.user){
+      out.style.display='none'; inn.style.display='block';
+      document.getElementById('accEmail').textContent=authSession.user.email||'Sesión iniciada';
+      const t=S._synced?new Date(S._synced):null;
+      document.getElementById('accSync').textContent = t ? ('Última sincronización: '+t.toLocaleString('es-ES',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})) : 'Sin sincronizar todavía';
+    } else { inn.style.display='none'; out.style.display='block'; }
+  }
+
+  async function signIn(mode){
+    if(!sb) return;
+    const email=document.getElementById('accEmailIn').value.trim();
+    const pass=document.getElementById('accPassIn').value;
+    if(!email||pass.length<6){ setAccMsg('Escribe tu correo y una contraseña de 6 caracteres o más.','warn'); return; }
+    setAccMsg('Conectando…');
+    try{
+      let r;
+      if(mode==='up'){
+        r=await sb.auth.signUp({email,password:pass});
+        if(r.error) throw r.error;
+        if(!r.data.session){ setAccMsg('Te hemos enviado un correo para confirmar la cuenta.','ok'); return; }
+      } else {
+        r=await sb.auth.signInWithPassword({email,password:pass});
+        if(r.error) throw r.error;
+      }
+      authSession=r.data.session; setAccMsg('');
+      document.getElementById('accPassIn').value='';
+      await pullRemote(true); renderAccount();
+      toast('Sesión iniciada');
+    }catch(e){
+      const m=(e&&e.message)||'';
+      setAccMsg(/Invalid login/i.test(m)?'Correo o contraseña incorrectos.':
+               (/already registered/i.test(m)?'Ese correo ya tiene cuenta: pulsa Entrar.':('No se pudo: '+m)),'warn');
+    }
+  }
+
+  async function signOut(){
+    if(!sb) return;
+    await pushRemote();            // no perder lo último antes de salir
+    await sb.auth.signOut();
+    authSession=null; renderAccount(); toast('Sesión cerrada');
+  }
+
+  // Sube los datos locales (con antirrebote para no llamar en cada toque)
+  function queuePush(){
+    if(!sb||!authSession) return;
+    clearTimeout(pushTimer); pushTimer=setTimeout(pushRemote,2500);
+  }
+  async function pushRemote(){
+    if(!sb||!authSession||syncing) return;
+    syncing=true;
+    try{
+      const payload=JSON.parse(JSON.stringify(S)); delete payload._synced;
+      const {error}=await sb.from('user_data').upsert({user_id:authSession.user.id,data:payload,updated_at:new Date().toISOString()});
+      if(!error){ S._synced=Date.now(); writeStore(JSON.stringify(S)); renderAccount(); }
+    }catch(e){ /* sin conexión: se reintenta en el próximo guardado */ }
+    syncing=false;
+  }
+
+  // Descarga lo remoto y se queda con la versión más reciente
+  async function pullRemote(showMsg){
+    if(!sb||!authSession) return;
+    try{
+      const {data,error}=await sb.from('user_data').select('data,updated_at').eq('user_id',authSession.user.id).maybeSingle();
+      if(error) throw error;
+      if(!data){ await pushRemote(); if(showMsg) toast('Datos subidos a tu cuenta'); return; }
+      const remote=data.data||{}, rts=remote._ts||new Date(data.updated_at).getTime(), lts=S._ts||0;
+      const localVacio=!S.days||Object.keys(S.days).length===0;
+      if(rts>lts||localVacio){
+        S=remote; if(!S.profile) S.profile={weight:null,height:null,age:null,sex:'m',goal:'recomp',intens:'normal'};
+        if(!S.days) S.days={}; if(!Array.isArray(S.shop)) S.shop=[]; if(!S.loads) S.loads={}; if(!S.measures) S.measures={};
+        S._synced=Date.now(); writeStore(JSON.stringify(S));
+        renderAll(); renderAccount();
+        if(showMsg) toast('Datos recuperados de tu cuenta');
+      } else { await pushRemote(); if(showMsg) toast('Tus datos locales eran más recientes'); }
+    }catch(e){ if(showMsg) setAccMsg('No se pudo sincronizar. Lo intentaremos luego.','warn'); }
+  }
+
+  if(CLOUD_ON){
+    document.getElementById('accIn').addEventListener('click',()=>signIn('in'));
+    document.getElementById('accUp').addEventListener('click',()=>signIn('up'));
+    document.getElementById('accOut').addEventListener('click',signOut);
+    document.getElementById('accNow').addEventListener('click',async()=>{ setAccMsg('Sincronizando…'); await pullRemote(true); setAccMsg(''); });
+    window.addEventListener('online',()=>{ if(authSession) pushRemote(); });
+  }
+
+  /* ===== INSTALACIÓN EN LA PANTALLA DE INICIO ===== */
+  const UA=navigator.userAgent||'';
+  const isIOS=/iPad|iPhone|iPod/.test(UA)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+  const isAndroid=/Android/.test(UA);
+  // navegadores dentro de otras apps (Instagram, Facebook, TikTok…) no pueden instalar
+  const inApp=/FBAN|FBAV|Instagram|Line|TikTok|Twitter|WhatsApp/i.test(UA);
+  const isSafari=/Safari/.test(UA)&&!/CriOS|FxiOS|EdgiOS|OPiOS/.test(UA);
+  function isInstalled(){
+    return (window.matchMedia&&window.matchMedia('(display-mode: standalone)').matches)||navigator.standalone===true;
+  }
+  let deferredPrompt=null;
+  window.addEventListener('beforeinstallprompt',e=>{ e.preventDefault(); deferredPrompt=e; showInstallUI(); });
+  window.addEventListener('appinstalled',()=>{ deferredPrompt=null; hideInstallBar(); toast('¡App instalada!'); });
+
+  function showInstallUI(){
+    if(isInstalled()) return;
+    if(localStorage.getItem('mamadofit-install-dismissed')==='1'){ showProfileInstall(); return; }
+    const bar=document.getElementById('installBar');
+    document.getElementById('ibSub').textContent = isIOS ? 'Añádela a tu pantalla de inicio' : 'Tenla como app, funciona sin conexión';
+    bar.classList.add('show'); document.body.classList.add('has-bar');
+    showProfileInstall();
+  }
+  function showProfileInstall(){ if(!isInstalled()) document.getElementById('installFromProfile').style.display='block'; }
+  function hideInstallBar(){ document.getElementById('installBar').classList.remove('show'); document.body.classList.remove('has-bar');
+    document.getElementById('installFromProfile').style.display='none'; }
+
+  async function doInstall(){
+    vibe(12);
+    // Android / Chrome / Edge: instalación nativa en un toque
+    if(deferredPrompt){
+      deferredPrompt.prompt();
+      try{ const r=await deferredPrompt.userChoice; if(r.outcome==='accepted') hideInstallBar(); }catch(e){}
+      deferredPrompt=null; return;
+    }
+    // iOS y resto: instrucciones guiadas
+    openIOS();
+  }
+  function openIOS(){
+    const steps=document.getElementById('iosSteps');
+    const lede=document.getElementById('iosLede');
+    let list;
+    if(inApp){
+      lede.textContent='Estás en un navegador dentro de otra app y no permite instalar.';
+      list=[['1','Abre el menú','Toca los tres puntos de arriba.'],
+            ['2','Abrir en el navegador','Elige «Abrir en Safari» o «Abrir en Chrome».'],
+            ['3','Vuelve a pulsar Instalar','Ya te dejará añadirla a la pantalla de inicio.']];
+    } else if(isIOS && !isSafari){
+      lede.textContent='En iPhone solo Safari puede instalar la app.';
+      list=[['1','Copia esta dirección','La de la barra de arriba.'],
+            ['2','Ábrela en Safari','Pégala en Safari y entra.'],
+            ['3','Compartir → Añadir a inicio','Con el botón de compartir de abajo.']];
+    } else if(isIOS){
+      lede.textContent='Tres pasos y la tendrás como una app más.';
+      list=[['1','Pulsa Compartir','El icono del cuadrado con la flecha hacia arriba, abajo en la barra de Safari.'],
+            ['2','«Añadir a pantalla de inicio»','Baja un poco en la lista de opciones hasta encontrarlo.'],
+            ['3','Pulsa «Añadir»','Arriba a la derecha. Listo: aparecerá el icono naranja.']];
+    } else if(isAndroid){
+      lede.textContent='Desde el menú del navegador en dos toques.';
+      list=[['1','Abre el menú','Los tres puntos, arriba a la derecha.'],
+            ['2','«Instalar app»','O «Añadir a pantalla de inicio».'],
+            ['3','Confirma','Aparecerá el icono en tu pantalla.']];
+    } else {
+      lede.textContent='Desde la barra de direcciones de tu navegador.';
+      list=[['1','Busca el icono de instalar','A la derecha de la barra de direcciones.'],
+            ['2','Pulsa «Instalar»','También está en el menú del navegador.'],
+            ['3','Ábrela como app','Se abrirá en su propia ventana.']];
+    }
+    steps.innerHTML=list.map(s=>'<div class="istep"><span class="in">'+s[0]+'</span><div><b>'+s[1]+'</b><span>'+s[2]+'</span></div></div>').join('');
+    document.getElementById('iosBg').classList.add('open');
+    document.getElementById('iosSheet').classList.add('open');
+  }
+  function closeIOS(){ document.getElementById('iosBg').classList.remove('open'); document.getElementById('iosSheet').classList.remove('open'); }
+  document.getElementById('iosBg').addEventListener('click',closeIOS);
+  document.getElementById('iosOk').addEventListener('click',closeIOS);
+  document.getElementById('installBtn').addEventListener('click',doInstall);
+  document.getElementById('installFromProfile').addEventListener('click',()=>{ closeSheet(); setTimeout(doInstall,260); });
+  document.getElementById('installClose').addEventListener('click',()=>{
+    try{ localStorage.setItem('mamadofit-install-dismissed','1'); }catch(e){}
+    hideInstallBar(); showProfileInstall(); });
+
+  // iOS no emite beforeinstallprompt: mostramos la barra igualmente
+  // Si el evento nativo no llega (iOS, Firefox, Samsung…), mostramos la barra igualmente:
+  // el botón abrirá entonces las instrucciones guiadas de esa plataforma.
+  setTimeout(()=>{ if(!isInstalled()) showInstallUI(); }, 1500);
+
+  /* ===== VISOR DE EJERCICIO ===== */
+  function hasDemo(nm){ return !!EXDEMO[nm]; }
+  function openDemo(nm){
+    const id=EXDEMO[nm]; if(!id) return;
+    vibe(12);
+    document.getElementById('demoTitle').textContent=nm;
+    document.getElementById('demoStage').innerHTML=
+      '<div class="demo-frames">'+
+      '<img class="df f0" src="'+EXDB+id+'/0.jpg" alt="" loading="lazy" data-alt="'+EXDB_ALT+id+'/0.jpg">'+
+      '<img class="df f1" src="'+EXDB+id+'/1.jpg" alt="" loading="lazy" data-alt="'+EXDB_ALT+id+'/1.jpg">'+
+      '<span class="demo-tag">Inicio · Final</span></div>';
+    document.getElementById('demoCue').textContent=EXCUE[id]||'';
+    document.getElementById('demoMeta').innerHTML='<span class="ing">Imágenes de free-exercise-db (dominio público)</span>';
+    // si el CDN falla, reintenta desde GitHub
+    document.querySelectorAll('.demo-frames img').forEach(im=>{
+      im.addEventListener('error',()=>{ const a=im.dataset.alt; if(a&&im.src!==a) im.src=a; },{once:true});
+    });
+    document.getElementById('demoBg').classList.add('open');
+    document.getElementById('demoSheet').classList.add('open');
+  }
+  function closeDemo(){ document.getElementById('demoBg').classList.remove('open'); document.getElementById('demoSheet').classList.remove('open'); }
+  document.getElementById('demoBg').addEventListener('click',closeDemo);
+  document.getElementById('demoOk').addEventListener('click',closeDemo);
 
   /* ===== CAMBIAR ENTRENO ===== */
   let wswapKey=null, wswapLvl='normal';
@@ -1703,7 +2248,7 @@
   let tt=null; function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('show'),1600);}
 
   function renderAll(){ renderHeader(); renderElevation(); renderEntreno(); updateBadge(); }
-  async function init(){ await load(); renderAll(); }
+  async function init(){ await load(); renderAll(); initCloud(); }
   init();
 })();
 </script>
