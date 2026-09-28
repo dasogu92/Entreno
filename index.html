@@ -486,6 +486,41 @@
   /* en descanso el anillo también va en verde */
   .player.rest #pRingFill{stroke:var(--done);}
   .player.prep #pRingFill{stroke:var(--gold);}
+
+  /* ====== SUSCRIPCIÓN ====== */
+  .pro-head{display:flex;align-items:center;justify-content:space-between;}
+  .pro-badge{font-size:9.5px;font-weight:800;letter-spacing:.14em;padding:4px 10px;border-radius:99px;
+    background:var(--panel3);color:var(--muted);}
+  .pro-badge.on{background:linear-gradient(135deg,#d4ff3d,#8fc400);color:var(--ink);}
+  .pro-badge.trial{background:linear-gradient(135deg,#ffd23d,#f4a300);color:var(--ink);}
+  .pay-hero{text-align:center;margin-bottom:18px;}
+  .pay-icon{width:62px;height:62px;border-radius:15px;}
+  .pay-list{list-style:none;padding:0;margin:0 0 18px;}
+  .pay-list li{display:flex;flex-direction:column;padding:11px 0 11px 28px;border-bottom:1px solid var(--line);position:relative;}
+  .pay-list li:last-child{border-bottom:none;}
+  .pay-list li::before{content:'';position:absolute;left:4px;top:15px;width:11px;height:6px;
+    border-left:2.4px solid var(--done);border-bottom:2.4px solid var(--done);transform:rotate(-45deg);}
+  .pay-list b{font-size:14px;font-weight:700;}
+  .pay-list span{font-size:12px;color:var(--muted);margin-top:2px;}
+  .pay-price-row{display:flex;align-items:center;justify-content:space-between;background:var(--panel2);
+    border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:14px;}
+  .pay-price-row span{font-size:13px;color:var(--muted);}
+  .pay-price-row b{font-family:'Archivo';font-weight:800;font-size:21px;
+    background:linear-gradient(135deg,#ff8a1f,#ff3d00);-webkit-background-clip:text;background-clip:text;color:transparent;}
+  #payBg{z-index:66;} #paySheet{z-index:67;}
+
+  /* ====== PROMOCIÓN ====== */
+  .pay-promo{background:linear-gradient(135deg,rgba(194,230,37,.12),rgba(244,180,0,.08));
+    border:1px solid var(--done);border-radius:12px;padding:13px 15px;margin-bottom:12px;cursor:pointer;}
+  .pay-promo:active{transform:scale(.99);}
+  .promo-top{font-size:12.5px;color:var(--done);font-weight:600;}
+  .promo-top b{font-weight:800;}
+  .promo-row{display:flex;align-items:center;justify-content:space-between;margin-top:9px;}
+  .promo-code{font-family:'JetBrains Mono';font-weight:800;font-size:15px;letter-spacing:.1em;color:var(--text);
+    background:var(--panel3);border:1px dashed var(--line2);border-radius:8px;padding:6px 12px;}
+  .promo-new{font-family:'Archivo';font-weight:800;font-size:19px;color:var(--done);}
+  .promo-foot{font-size:10.5px;color:var(--muted2);margin-top:8px;}
+  .pay-price-row b{font-size:19px;}
 </style>
 </head>
 <body>
@@ -684,6 +719,15 @@
     <div class="field"><label>Intensidad del entreno</label><div class="seg" id="pInt"><button data-i="soft">Suave</button><button data-i="normal" class="on">Normal</button><button data-i="hard">Intenso</button></div>
       <p class="note" id="intNote" style="margin-top:8px;">Normal: el plan tal cual. Suave baja series y sube descansos; Intenso añade series y recorta descansos.</p></div>
     <button class="save-profile" id="saveProfile">Guardar perfil</button>
+    <div class="card acc-card" id="proCard" style="display:none;">
+      <div class="pro-head">
+        <span class="pro-badge" id="proBadge">GRATIS</span>
+        <span class="pro-price" id="proPriceTop"></span>
+      </div>
+      <h2 style="font-size:19px;margin-top:8px;">Fitness de semana Pro</h2>
+      <p class="lede" id="proTxt">—</p>
+      <button class="save-profile" id="proBtn" style="margin-top:2px;">Hazte Pro</button>
+    </div>
     <div class="card acc-card" id="accountCard" style="display:none;">
       <div class="eyebrow sky"><span class="dot"></span><span>Tu cuenta</span></div>
       <div id="accAnon">
@@ -763,6 +807,29 @@
   <p class="demo-cue" id="demoCue"></p>
 <div id="demoMeta" class="demo-meta"></div>
   <button class="save-profile" id="demoOk">Entendido</button>
+</div>
+
+<div class="sheet-bg" id="payBg"></div>
+<div class="sheet" id="paySheet">
+<div class="grab"></div>
+<div class="pay-hero">
+<img src="icon-192.png" alt="" class="pay-icon">
+<h3 style="margin:10px 0 4px;">Hazte Pro</h3>
+<p class="lede" id="payLede" style="margin:0;">Tu prueba ha terminado.</p>
+</div>
+<ul class="pay-list">
+<li><b>Progreso completo</b><span>Peso, composición corporal, medidas e historial</span></li>
+<li><b>Cargas por ejercicio</b><span>Registra kilos y ve tu progresión real</span></li>
+<li><b>Cambiar entreno y comidas</b><span>21 entrenos y 52 platos a elegir</span></li>
+<li><b>Sincronización</b><span>Tus datos a salvo y en todos tus móviles</span></li>
+<li><b>Sin anuncios, para siempre</b><span>La app se mantiene con tu apoyo</span></li>
+</ul>
+<div class="pay-promo" id="payPromo" style="display:none;"></div>
+<div class="pay-price-row"><span>Suscripción</span><b id="payPrice">6,99 €/mes</b></div>
+<button class="save-profile" id="payGo">Suscribirme</button>
+<button class="btn-sec" id="payRestore" style="width:100%;margin-top:9px;">Ya soy Pro — actualizar</button>
+<button class="danger" id="payClose">Ahora no</button>
+<p class="note" style="text-align:center;">Puedes cancelar cuando quieras. El plan diario de entreno y comida seguirá siendo gratis.</p>
 </div>
 
 <!-- PLAYER -->
@@ -1310,6 +1377,21 @@
   const SUPA_KEY='';
   const CLOUD_ON = !!(SUPA_URL && SUPA_KEY);
 
+  /* ===== SUSCRIPCIÓN =====
+     CHECKOUT_URL: enlace de pago (Lemon Squeezy, Stripe, Ko-fi…). Vacío = no se muestra nada de pago.
+     GATE: true bloquea las funciones Pro al acabar la prueba; false las deja abiertas (solo pide apoyo).
+     TRIAL_DAYS: días de prueba completa desde el primer uso. */
+  const PAY = {
+    CHECKOUT_URL: '',
+    PRICE: '6,99 €/mes',
+    GATE: true,
+    TRIAL_DAYS: 7,
+    // Descuento de lanzamiento. En Stripe el cupón debe crearse con duración
+    // "Repeating / 12 months"; si se deja en "Once" solo valdría el primer mes.
+    PROMO: { CODE: 'FUNDADORES', OFF: '30 %', PRICE: '4,89 €/mes', PLAZO: 'el primer año' }
+  };
+  const PAY_ON = !!PAY.CHECKOUT_URL;
+
   const KEY='fds-store-v1';
   const OLD_KEYS=['mamadofit-store-v1','recomp-store-v3'];   // migración desde nombres anteriores
   let S={profile:{weight:null,height:null,age:null,sex:'m',goal:'recomp',intens:'normal'},days:{}};
@@ -1481,7 +1563,7 @@
         (demo?('<button class="exthumb" aria-label="Ver cómo se hace">'+demoFrames(ex.nm,'thumb')+'</button>'):'<span class="exthumb empty"></span>')+
         '<div class="body"><div class="nm">'+ex.nm+'</div>'+(showLoad?('<div class="exload">'+loadChip(ex.nm)+'</div>'):'')+'</div><div class="sets">'+detail+'</div>';
       if(!isT) row.querySelector('.chk').addEventListener('click',e=>{tap(e.currentTarget);rec.ex[i]=!rec.ex[i];save();renderEntreno();renderHeader();renderElevation();});
-      const lb=row.querySelector('.loadbtn'); if(lb) lb.addEventListener('click',()=>{ vibe(12); openLoad(ex.nm); });
+      const lb=row.querySelector('.loadbtn'); if(lb) lb.addEventListener('click',()=>{ vibe(12); if(requirePro('Registro de cargas')) openLoad(ex.nm); });
       const th=row.querySelector('.exthumb'); if(th&&demo) th.addEventListener('click',e=>{ e.stopPropagation(); openDemo(ex.nm); });
       list.appendChild(row); });
     wireFallback(list);
@@ -1511,7 +1593,7 @@
         '<button class="swapbtn" aria-label="Cambiar comida"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 2l4 4-4 4"/><path d="M3 6h18"/><path d="M7 22l-4-4 4-4"/><path d="M21 18H3"/></svg></button>'+
         '</div><div class="ingredients">'+chips+'</div>';
       if(!isT) card.querySelector('.chk').addEventListener('click',e=>{tap(e.currentTarget);rec.meals[i]=!rec.meals[i];save();renderComida();});
-      card.querySelector('.swapbtn').addEventListener('click',()=>{ vibe(12); openSwap(key,i); });
+      card.querySelector('.swapbtn').addEventListener('click',()=>{ vibe(12); if(requirePro('Cambiar comida')) openSwap(key,i); });
       ml.appendChild(card); });
     renderShop();
     renderElevation(); renderHeader();
@@ -1898,6 +1980,110 @@
   document.getElementById('pSkip').addEventListener('click',advance);
   document.getElementById('pClose').addEventListener('click',()=>{ if(confirm('¿Salir del entrenamiento? Se guarda lo que ya has completado.')) closePlayer(); });
 
+  /* ===== PLAN PRO / PRUEBA ===== */
+  function firstUse(){
+    if(!S._first){ S._first=Date.now(); writeStore(JSON.stringify(S)); }
+    return S._first;
+  }
+  function trialLeft(){
+    const ms=PAY.TRIAL_DAYS*86400000-(Date.now()-firstUse());
+    return Math.max(0, Math.ceil(ms/86400000));
+  }
+  function isPro(){
+    if(!PAY_ON) return true;                       // sin pago configurado, todo abierto
+    if(S._premium_until && new Date(S._premium_until).getTime()>Date.now()) return true;
+    return false;
+  }
+  // acceso efectivo: Pro, o prueba en curso, o bloqueo desactivado
+  function hasAccess(){ return !PAY_ON || !PAY.GATE || isPro() || trialLeft()>0; }
+
+  function goCheckout(){
+    // sin cuenta no se puede pagar: el cobro quedaría huérfano y nadie sabría a quién activar
+    if(CLOUD_ON && !authSession){
+      closePay();
+      setAccMsg('Crea tu cuenta o entra antes de suscribirte: así el pago queda ligado a ti.','warn');
+      openSheet();
+      setTimeout(()=>{ const e=document.getElementById('accEmailIn'); if(e) e.focus(); },400);
+      return;
+    }
+    let u=PAY.CHECKOUT_URL;
+    const q=[];
+    if(authSession&&authSession.user){
+      const mail=authSession.user.email||'';
+      if(/stripe\.com/i.test(u)){
+        // Stripe: el identificador vuelve en el webhook, es la forma fiable de emparejar
+        q.push('client_reference_id='+encodeURIComponent(authSession.user.id));
+        if(mail) q.push('prefilled_email='+encodeURIComponent(mail));
+        if(PAY.PROMO&&PAY.PROMO.CODE) q.push('prefilled_promo_code='+encodeURIComponent(PAY.PROMO.CODE));
+      } else {
+        if(mail) q.push('checkout[email]='+encodeURIComponent(mail));
+        q.push('checkout[custom][user_id]='+encodeURIComponent(authSession.user.id));
+      }
+    }
+    if(q.length) u+=(u.indexOf('?')<0?'?':'&')+q.join('&');
+    window.open(u,'_blank','noopener');
+  }
+
+  // muro suave: se llama antes de una función Pro; devuelve false si hay que bloquear
+  function requirePro(nombre){
+    if(hasAccess()) return true;
+    openPay(nombre); return false;
+  }
+  function openPay(nombre){
+    const s=document.getElementById('paySheet');
+    document.getElementById('payLede').textContent = nombre
+      ? ('«'+nombre+'» forma parte de Pro.')
+      : 'Tu prueba ha terminado.';
+    document.getElementById('payPrice').textContent=PAY.PRICE;
+    const promo=document.getElementById('payPromo');
+    if(PAY.PROMO&&PAY.PROMO.CODE&&!isPro()){
+      promo.style.display='block';
+      promo.innerHTML='<div class="promo-top">'+PAY.PROMO.OFF+' de descuento <b>'+PAY.PROMO.PLAZO+'</b></div>'+
+        '<div class="promo-row"><span class="promo-code">'+PAY.PROMO.CODE+'</span>'+
+        '<span class="promo-new">'+PAY.PROMO.PRICE+'</span></div>'+
+        '<div class="promo-foot">Solo para nuevas suscripciones. Toca el código para copiarlo.</div>';
+      promo.onclick=()=>{ vibe(12);
+        try{ navigator.clipboard.writeText(PAY.PROMO.CODE); toast('Código copiado'); }catch(e){}
+      };
+    } else promo.style.display='none';
+    const go=document.getElementById('payGo');
+    go.textContent = (CLOUD_ON && !authSession) ? 'Crear cuenta y suscribirme' : 'Suscribirme';
+    document.getElementById('payBg').classList.add('open'); s.classList.add('open');
+  }
+  function closePay(){ document.getElementById('payBg').classList.remove('open'); document.getElementById('paySheet').classList.remove('open'); }
+
+  function renderPay(){
+    if(!PAY_ON) return;
+    const card=document.getElementById('proCard'); if(!card) return;
+    card.style.display='block';
+    const pro=isPro(), left=trialLeft();
+    const badge=document.getElementById('proBadge'), txt=document.getElementById('proTxt'), btn=document.getElementById('proBtn');
+    if(pro){
+      badge.textContent='PRO'; badge.className='pro-badge on';
+      const d=S._premium_until?new Date(S._premium_until):null;
+      txt.textContent = d ? ('Suscripción activa hasta el '+d.toLocaleDateString('es-ES',{day:'numeric',month:'long',year:'numeric'})) : 'Suscripción activa. Gracias por apoyar la app.';
+      btn.style.display='none';
+    } else if(left>0){
+      badge.textContent='PRUEBA'; badge.className='pro-badge trial';
+      txt.textContent='Te quedan '+left+' día'+(left>1?'s':'')+' de prueba con todo desbloqueado.';
+      btn.style.display='block'; btn.textContent='Hazte Pro · '+PAY.PRICE;
+    } else {
+      badge.textContent='GRATIS'; badge.className='pro-badge';
+      txt.textContent='Sigue el plan diario gratis. Pro añade progreso, cargas, medidas, sincronización y cambios de entreno o comida.';
+      btn.style.display='block'; btn.textContent='Hazte Pro · '+PAY.PRICE;
+    }
+  }
+  if(PAY_ON){
+    document.getElementById('payBg').addEventListener('click',closePay);
+    document.getElementById('payClose').addEventListener('click',closePay);
+    document.getElementById('payGo').addEventListener('click',()=>{ vibe(12); goCheckout(); });
+    document.getElementById('proBtn').addEventListener('click',()=>{ vibe(12); closeSheet(); setTimeout(()=>openPay(null),260); });
+    document.getElementById('payRestore').addEventListener('click',async()=>{
+      if(!sb||!authSession){ alert('Entra con tu cuenta para recuperar la suscripción.'); return; }
+      await pullRemote(true); renderPay(); closePay(); toast('Estado actualizado');
+    });
+  }
+
   /* ===== CUENTA Y SINCRONIZACIÓN EN LA NUBE ===== */
   let sb=null, authSession=null, pushTimer=null, syncing=false;
 
@@ -1985,13 +2171,16 @@
   async function pullRemote(showMsg){
     if(!sb||!authSession) return;
     try{
-      const {data,error}=await sb.from('user_data').select('data,updated_at').eq('user_id',authSession.user.id).maybeSingle();
+      const {data,error}=await sb.from('user_data').select('data,updated_at,premium_until').eq('user_id',authSession.user.id).maybeSingle();
       if(error) throw error;
+      if(data&&'premium_until' in data){ S._premium_until=data.premium_until||null; renderPay(); }
       if(!data){ await pushRemote(); if(showMsg) toast('Datos subidos a tu cuenta'); return; }
       const remote=data.data||{}, rts=remote._ts||new Date(data.updated_at).getTime(), lts=S._ts||0;
       const localVacio=!S.days||Object.keys(S.days).length===0;
       if(rts>lts||localVacio){
+        const keepPro=S._premium_until, keepFirst=S._first;
         S=remote; if(!S.profile) S.profile={weight:null,height:null,age:null,sex:'m',goal:'recomp',intens:'normal'};
+        if(keepPro) S._premium_until=keepPro; if(!S._first) S._first=keepFirst||Date.now();
         if(!S.days) S.days={}; if(!Array.isArray(S.shop)) S.shop=[]; if(!S.loads) S.loads={}; if(!S.measures) S.measures={};
         S._synced=Date.now(); writeStore(JSON.stringify(S));
         renderAll(); renderAccount();
@@ -2169,7 +2358,7 @@
   function closeWSwap(){ document.getElementById('wswapBg').classList.remove('open'); document.getElementById('wswapSheet').classList.remove('open'); }
   document.getElementById('wswapBg').addEventListener('click',closeWSwap);
   document.getElementById('wswapClose').addEventListener('click',closeWSwap);
-  document.getElementById('wSwapBtn').addEventListener('click',()=>{ vibe(12); openWSwap(wKey()); });
+  document.getElementById('wSwapBtn').addEventListener('click',()=>{ vibe(12); if(requirePro('Cambiar entreno')) openWSwap(wKey()); });
   document.querySelectorAll('#wswapInt button').forEach(b=>b.addEventListener('click',()=>{
     wswapLvl=b.dataset.i;
     document.querySelectorAll('#wswapInt button').forEach(x=>x.classList.remove('on')); b.classList.add('on');
@@ -2279,7 +2468,8 @@
   /* ===== NAV ===== */
   function show(tab){ document.querySelectorAll('.navbtn').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));
     document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id==='v-'+tab));
-    if(tab==='comida')renderComida(); if(tab==='compensar')renderCompensar(); if(tab==='progreso')renderProgreso(); if(tab==='entreno')renderEntreno();
+    if(tab==='comida')renderComida(); if(tab==='compensar')renderCompensar(); if(tab==='entreno')renderEntreno();
+    if(tab==='progreso'){ renderProgreso(); if(!hasAccess()) openPay('Progreso'); }
     window.scrollTo({top:0,behavior:'smooth'}); }
   document.querySelectorAll('.navbtn').forEach(b=>b.addEventListener('click',()=>{vibe(10);show(b.dataset.tab);}));
 
@@ -2329,7 +2519,7 @@
 
   let tt=null; function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('show'),1600);}
 
-  function renderAll(){ renderHeader(); renderElevation(); renderEntreno(); updateBadge(); }
+  function renderAll(){ firstUse(); renderHeader(); renderElevation(); renderEntreno(); updateBadge(); renderPay(); }
   async function init(){ await load(); renderAll(); initCloud(); }
   init();
 })();

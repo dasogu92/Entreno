@@ -8,28 +8,47 @@ Entra en [supabase.com](https://supabase.com), crea una cuenta y un proyecto nue
 
 El plan gratuito incluye 50.000 usuarios activos al mes y 500 MB de base de datos. Para el tamaño de esta app, los datos de un usuario ocupan unos pocos KB: te sobra de largo.
 
-## 2. Crea la tabla
+## 2. Crea las tablas
 
-En el panel de Supabase, ve a **SQL Editor** y ejecuta esto:
+En el panel de Supabase, ve a **SQL Editor** → **New query**, pega esto entero y pulsa **Run**.
+Lo deja todo listo de una vez, incluido lo que hará falta el día que cobres.
 
 ```sql
+-- Datos de cada usuario (su historial completo en un JSON)
 create table if not exists public.user_data (
-  user_id    uuid primary key references auth.users on delete cascade,
-  data       jsonb not null default '{}'::jsonb,
-  updated_at timestamptz not null default now()
+  user_id       uuid primary key references auth.users on delete cascade,
+  data          jsonb not null default '{}'::jsonb,
+  premium_until timestamptz,
+  updated_at    timestamptz not null default now()
 );
 
-alter table public.user_data enable row level security;
+-- Relación entre el cliente de Stripe y el usuario (para cuando actives el cobro)
+create table if not exists public.billing (
+  user_id         uuid primary key references auth.users on delete cascade,
+  stripe_customer text unique not null
+);
 
-create policy "leer lo propio"      on public.user_data
-  for select using (auth.uid() = user_id);
-create policy "insertar lo propio"  on public.user_data
-  for insert with check (auth.uid() = user_id);
-create policy "actualizar lo propio" on public.user_data
-  for update using (auth.uid() = user_id);
+-- Seguridad: cada uno solo ve y toca lo suyo
+alter table public.user_data enable row level security;
+alter table public.billing   enable row level security;
+
+drop policy if exists "leer lo propio"       on public.user_data;
+drop policy if exists "insertar lo propio"   on public.user_data;
+drop policy if exists "actualizar lo propio" on public.user_data;
+
+create policy "leer lo propio"       on public.user_data for select using (auth.uid() = user_id);
+create policy "insertar lo propio"   on public.user_data for insert with check (auth.uid() = user_id);
+create policy "actualizar lo propio" on public.user_data for update using (auth.uid() = user_id);
+
+-- El usuario puede leer si tiene Pro, pero NO puede escribírselo él mismo.
+-- Sin esto, cualquiera se regalaría la suscripción desde el navegador.
+revoke update on public.user_data from authenticated;
+grant  update (data, updated_at) on public.user_data to authenticated;
+
+-- La tabla billing no lleva políticas a propósito: solo la escribe el servidor.
 ```
 
-Las tres políticas son importantes: garantizan que cada usuario solo puede leer y escribir **sus** datos, aunque la clave de la app sea pública.
+Si sale **Success. No rows returned**, ha ido bien.
 
 ## 3. Copia tus credenciales
 
