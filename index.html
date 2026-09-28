@@ -610,7 +610,6 @@
   .grab{cursor:grab;position:relative;z-index:2;padding:0;height:4px;}
   .sheet::before{content:'';position:absolute;top:0;left:0;right:0;height:46px;}
 
-  nav.bottom .navbtn[data-tab="comida"] svg{stroke:none;fill:currentColor;}
 
   /* ====== MODO SOCIAL ====== */
   .soc-list{margin-bottom:14px;}
@@ -842,7 +841,7 @@
 
   <nav class="bottom">
     <button class="navbtn active" data-tab="entreno"><svg viewBox="0 0 24 24"><path d="M6 7v10M18 7v10M6 12h12M3 9v6M21 9v6"/></svg><span class="t">Entrenar</span></button>
-    <button class="navbtn" data-tab="comida"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M13.6 3.3c2.8-2 6.6.2 6.9 3.6.3 3.1-2.3 5.9-5.4 5.6-.9-.1-1.6.2-2.2.8l-2.4 2.4-2.4-2.4 2.4-2.4c.6-.6.9-1.3.8-2.2-.2-2.3 1-4.3 2.3-5.4z"/><circle cx="6.1" cy="16.9" r="2.7"/><circle cx="3.9" cy="19.1" r="2.7"/></svg><span class="t">Comer</span></button>
+    <button class="navbtn" data-tab="comida"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 7.5c-1.2-2-3.2-2.6-4.8-1.9C5 6.6 4 9.3 4.7 12.4c.7 3.1 2.9 6.4 5 6.9 1 .2 1.7-.3 2.3-.3s1.3.5 2.3.3c2.1-.5 4.3-3.8 5-6.9.7-3.1-.3-5.8-2.5-6.8-1.6-.7-3.6-.1-4.8 1.9Z"/><path d="M12 7.5V4.2M12 4.2c1.6 0 2.6-1 2.8-2.2-1.5-.2-2.6.7-2.8 2.2Z"/></svg><span class="t">Comer</span></button>
     <button class="navbtn" data-tab="compensar"><svg viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h12"/><circle cx="19" cy="18" r="2.5"/></svg><span class="t">Compensar</span><span class="badge" id="navBadge" style="display:none;">0</span></button>
     <button class="navbtn" data-tab="progreso"><svg viewBox="0 0 24 24"><path d="M3 3v18h18M7 14l4-4 3 3 5-6"/></svg><span class="t">Progreso</span></button>
   </nav>
@@ -2550,11 +2549,24 @@
     }
   }
 
+  function estadoVacio(){
+    return {profile:{weight:null,height:null,age:null,sex:'m',goal:'recomp',intens:'normal'},
+            days:{}, shop:[], loads:{}, measures:{}};
+  }
   async function signOut(){
     if(!sb) return;
-    await pushRemote();            // no perder lo último antes de salir
+    // 1) guardar todo en la nube antes de nada
+    clearTimeout(pushTimer);
+    await pushRemote();
+    const subido = !!S._synced && (Date.now()-S._synced)<15000;
+    if(!subido && !confirm('No se han podido guardar tus últimos cambios en la nube. ¿Cerrar sesión igualmente?')) return;
     await sb.auth.signOut();
-    authSession=null; renderAccount(); toast('Sesión cerrada');
+    authSession=null;
+    // 2) vaciar el móvil: si entra otra persona, no debe heredar tus datos
+    S=estadoVacio(); writeStore(JSON.stringify(S));
+    amigos=[]; socialCargado=false;
+    renderAccount(); renderAll(); renderSocial();
+    toast('Sesión cerrada');
     if(REQUIRE_ACCOUNT){ closeSheet(); setTimeout(showWelcome,300); }
   }
 
@@ -2583,7 +2595,8 @@
       if(data&&'premium_until' in data){ S._premium_until=data.premium_until||null; renderPay(); }
       if(!data){ await pushRemote(); if(showMsg) toast('Datos subidos a tu cuenta'); return; }
       const remote=data.data||{}, rts=remote._ts||new Date(data.updated_at).getTime(), lts=S._ts||0;
-      const localVacio=!S.days||Object.keys(S.days).length===0;
+      const sinPerfil=!S.profile||(!S.profile.weight&&!S.profile.height&&!S.profile.age);
+      const localVacio=(!S.days||Object.keys(S.days).length===0)&&sinPerfil;
       if(rts>lts||localVacio){
         const keepPro=S._premium_until, keepFirst=S._first;
         S=remote; if(!S.profile) S.profile={weight:null,height:null,age:null,sex:'m',goal:'recomp',intens:'normal'};
