@@ -580,6 +580,25 @@
   .ios-hint svg{width:16px;height:16px;color:var(--sky);flex-shrink:0;}
 
   #iosBg{z-index:62;} #iosSheet{z-index:63;}
+
+  /* ====== BIENVENIDA: FORMULARIO ====== */
+  .wl-formtitle{font-family:'Archivo';font-weight:800;font-size:22px;margin:0 0 16px;}
+  .wl-field{text-align:left;margin-bottom:13px;}
+  .wl-field label{display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:7px;}
+  .wl-field input{width:100%;background:var(--panel2);border:1px solid var(--line);color:var(--text);
+    border-radius:11px;padding:14px 15px;font-size:15.5px;}
+  .wl-field input:focus{border-color:var(--effort);outline:none;}
+  .wl-back{width:100%;background:none;border:none;color:var(--muted2);font-size:13px;padding:12px;}
+  #wlMsg{text-align:left;margin:0 0 12px;}
+
+  /* ====== INVITAR ====== */
+  .inv-box{background:var(--panel2);border:1px dashed var(--line2);border-radius:12px;padding:14px;text-align:center;}
+  .inv-lbl{display:block;font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);}
+  .inv-code{display:block;font-family:'JetBrains Mono';font-weight:800;font-size:26px;letter-spacing:.18em;
+    background:linear-gradient(135deg,#d4ff3d,#8fc400);-webkit-background-clip:text;background-clip:text;color:transparent;margin:7px 0 6px;}
+  .inv-link{display:block;font-size:10.5px;color:var(--muted2);word-break:break-all;}
+  #inviteCard .save-profile{width:100%;background:linear-gradient(135deg,#d4ff3d,#8fc400);border:none;color:var(--ink);
+    font-weight:800;font-size:15px;padding:14px;border-radius:12px;}
 </style>
 </head>
 <body>
@@ -786,6 +805,18 @@
     <div class="field"><label>Intensidad del entreno</label><div class="seg" id="pInt"><button data-i="soft">Suave</button><button data-i="normal" class="on">Normal</button><button data-i="hard">Intenso</button></div>
       <p class="note" id="intNote" style="margin-top:8px;">Normal: el plan tal cual. Suave baja series y sube descansos; Intenso añade series y recorta descansos.</p></div>
     <button class="save-profile" id="saveProfile">Guardar perfil</button>
+    <div class="card acc-card" id="inviteCard" style="display:none;">
+      <div class="eyebrow g"><span class="dot"></span><span>Invita a un amigo</span></div>
+      <h2 style="font-size:19px;">Comparte y ganáis los dos</h2>
+      <p class="lede">Quien entre con tu código se lleva <b>el doble de prueba</b>. Y por cada amigo que se suscriba, tú te llevas <b>un mes gratis</b>.</p>
+      <div class="inv-box">
+        <span class="inv-lbl">Tu código</span>
+        <span class="inv-code" id="invCode">——————</span>
+        <span class="inv-link" id="invLink"></span>
+      </div>
+      <button class="save-profile" id="invShare" style="margin-top:12px;">Compartir invitación</button>
+      <p class="note" id="invFrom" style="display:none;"></p>
+    </div>
     <div class="card acc-card" id="proCard" style="display:none;">
       <div class="pro-head">
         <span class="pro-badge" id="proBadge">GRATIS</span>
@@ -887,10 +918,25 @@
       <li><b>Compensa excesos</b><span>Cervezas y caprichos, con su factura</span></li>
     </ul>
     <div class="wl-trial" id="wlTrial">Crea tu cuenta y llévate <b>7 días con todo desbloqueado</b></div>
-    <button class="save-profile" id="wlSignup">Crear cuenta gratis</button>
-    <button class="btn-sec" id="wlLogin" style="width:100%;margin-top:9px;">Ya tengo cuenta</button>
-    <button class="wl-skip" id="wlSkip">Probar sin cuenta</button>
-    <p class="note" id="wlNote" style="text-align:center;">Con cuenta no pierdes tu progreso aunque cambies de móvil.</p>
+
+    <div id="wlIntro">
+      <button class="save-profile" id="wlSignup">Crear cuenta gratis</button>
+      <button class="btn-sec" id="wlLogin" style="width:100%;margin-top:9px;">Ya tengo cuenta</button>
+      <button class="wl-skip" id="wlSkip">Probar sin cuenta</button>
+      <p class="note" id="wlNote" style="text-align:center;">Con cuenta no pierdes tu progreso aunque cambies de móvil.</p>
+    </div>
+
+    <div id="wlForm" style="display:none;">
+      <h2 class="wl-formtitle" id="wlFormTitle">Crear cuenta</h2>
+      <div class="wl-field"><label>Correo</label>
+        <input type="email" id="wlEmail" placeholder="tu@correo.com" autocomplete="email" inputmode="email"></div>
+      <div class="wl-field"><label>Contraseña</label>
+        <input type="password" id="wlPass" placeholder="Mínimo 6 caracteres" autocomplete="current-password"></div>
+      <p class="acc-msg" id="wlMsg"></p>
+      <button class="save-profile" id="wlGo">Crear cuenta</button>
+      <button class="wl-skip" id="wlSwitch">¿Ya tienes cuenta? Entra aquí</button>
+      <button class="wl-back" id="wlBack">Volver</button>
+    </div>
   </div>
 </div>
 <div class="sheet-bg" id="payBg"></div>
@@ -2081,6 +2127,8 @@
     if(t) t.style.display = PAY_ON ? 'block' : 'none';
     const skip=document.getElementById('wlSkip');
     if(skip) skip.style.display = REQUIRE_ACCOUNT ? 'none' : 'block';
+    const rf=pendingRef();
+    if(rf&&t&&PAY_ON){ t.innerHTML='Vienes invitado con el código <b>'+rf+'</b>: te llevas <b>'+(PAY.TRIAL_DAYS*2)+' días</b> de prueba'; }
     const nota=document.getElementById('wlNote');
     if(nota) nota.textContent = REQUIRE_ACCOUNT
       ? 'Necesitas una cuenta para guardar tu progreso. Es gratis y solo pide un correo.'
@@ -2094,11 +2142,70 @@
     if(goTo){ setTimeout(()=>{ openSheet();
       setTimeout(()=>{ const e=document.getElementById('accEmailIn'); if(e) e.focus(); },350); },200); }
   }
-  if(CLOUD_ON){
-    document.getElementById('wlSignup').addEventListener('click',()=>{ vibe(12); hideWelcome(true); });
-    document.getElementById('wlLogin').addEventListener('click',()=>{ vibe(12); hideWelcome(true); });
-    document.getElementById('wlSkip').addEventListener('click',()=>{ vibe(10); hideWelcome(false); });
+  function wlMode(modo){
+    document.getElementById('wlIntro').style.display='none';
+    document.getElementById('wlForm').style.display='block';
+    document.getElementById('wlFormTitle').textContent = modo==='up'?'Crear cuenta':'Entrar';
+    document.getElementById('wlGo').textContent      = modo==='up'?'Crear cuenta':'Entrar';
+    document.getElementById('wlSwitch').textContent  = modo==='up'?'¿Ya tienes cuenta? Entra aquí':'¿No tienes cuenta? Créala aquí';
+    document.getElementById('wlPass').setAttribute('autocomplete', modo==='up'?'new-password':'current-password');
+    document.getElementById('wlMsg').textContent='';
+    document.getElementById('wlGo').dataset.modo=modo;
+    setTimeout(()=>document.getElementById('wlEmail').focus(),250);
   }
+  function wlIntro(){
+    document.getElementById('wlForm').style.display='none';
+    document.getElementById('wlIntro').style.display='block';
+  }
+  if(CLOUD_ON){
+    document.getElementById('wlSignup').addEventListener('click',()=>{ vibe(12); wlMode('up'); });
+    document.getElementById('wlLogin').addEventListener('click',()=>{ vibe(12); wlMode('in'); });
+    document.getElementById('wlSkip').addEventListener('click',()=>{ vibe(10); hideWelcome(false); });
+    document.getElementById('wlBack').addEventListener('click',()=>{ vibe(10); wlIntro(); });
+    document.getElementById('wlSwitch').addEventListener('click',()=>{ vibe(10);
+      wlMode(document.getElementById('wlGo').dataset.modo==='up'?'in':'up'); });
+    document.getElementById('wlGo').addEventListener('click',()=>{ vibe(12);
+      signIn(document.getElementById('wlGo').dataset.modo||'up','wl'); });
+    document.getElementById('wlPass').addEventListener('keydown',e=>{ if(e.key==='Enter') document.getElementById('wlGo').click(); });
+  }
+
+  /* ===== INVITAR A UN AMIGO ===== */
+  const REF_KEY='fds-ref-pending';
+  function pendingRef(){ try{ return localStorage.getItem(REF_KEY)||''; }catch(e){ return ''; } }
+  function clearPendingRef(){ try{ localStorage.removeItem(REF_KEY); }catch(e){} }
+  // si llegan con ?ref=CODIGO lo guardamos hasta que se registren
+  (function captarRef(){
+    try{
+      const m=location.search.match(/[?&]ref=([A-Za-z0-9]+)/);
+      if(m&&m[1]) localStorage.setItem(REF_KEY,m[1].toUpperCase());
+    }catch(e){}
+  })();
+  function miCodigo(){
+    if(!authSession||!authSession.user) return '';
+    return authSession.user.id.replace(/-/g,'').slice(0,6).toUpperCase();
+  }
+  function miEnlace(){ return location.origin+location.pathname+'?ref='+miCodigo(); }
+  function renderInvite(){
+    const card=document.getElementById('inviteCard'); if(!card) return;
+    if(!CLOUD_ON||!authSession){ card.style.display='none'; return; }
+    card.style.display='block';
+    document.getElementById('invCode').textContent=miCodigo();
+    document.getElementById('invLink').textContent=miEnlace().replace(/^https?:\/\//,'');
+    const de=document.getElementById('invFrom');
+    if(S._ref){ de.style.display='block'; de.textContent='Entraste invitado con el código '+S._ref+'.'; }
+    else de.style.display='none';
+  }
+  async function compartirInvite(){
+    vibe(12);
+    const txt='Te invito a Fitness de semana: entrena, come bien y compensa los excesos del finde. Con mi código '+miCodigo()+' tienes el doble de prueba.';
+    const url=miEnlace();
+    try{
+      if(navigator.share){ await navigator.share({title:'Fitness de semana', text:txt, url:url}); return; }
+    }catch(e){ return; }
+    try{ await navigator.clipboard.writeText(txt+' '+url); toast('Enlace copiado'); }catch(e){}
+  }
+
+
 
   /* ===== PLAN PRO / PRUEBA ===== */
   // La prueba se cuenta desde el registro y viaja con la cuenta:
@@ -2107,10 +2214,11 @@
     if(!S._first && (!CLOUD_ON || authSession)){ S._first=Date.now(); writeStore(JSON.stringify(S)); }
     return S._first||0;
   }
+  function diasPrueba(){ return S._ref ? PAY.TRIAL_DAYS*2 : PAY.TRIAL_DAYS; }
   function trialLeft(){
     if(CLOUD_ON && !authSession) return 0;      // sin cuenta no hay prueba
     const ini=firstUse(); if(!ini) return 0;
-    const ms=PAY.TRIAL_DAYS*86400000-(Date.now()-ini);
+    const ms=diasPrueba()*86400000-(Date.now()-ini);
     return Math.max(0, Math.ceil(ms/86400000));
   }
   function isPro(){
@@ -2226,13 +2334,14 @@
     }catch(e){ console.log('nube no disponible',e); }
   }
 
-  function setAccMsg(txt,kind){
+  function setAccMsg(txt,kind){ msgTarget='accMsg';
     const el=document.getElementById('accMsg'); if(!el) return;
     el.textContent=txt||''; el.className='acc-msg'+(kind?(' '+kind):'');
   }
 
   function renderAccount(){
     if(!CLOUD_ON) return;
+    renderInvite();
     const inn=document.getElementById('accLogged'), out=document.getElementById('accAnon');
     if(authSession&&authSession.user){
       out.style.display='none'; inn.style.display='block';
@@ -2242,33 +2351,50 @@
     } else { inn.style.display='none'; out.style.display='block'; }
   }
 
-  async function signIn(mode){
+  let msgTarget='accMsg';
+  function setMsg(txt,kind){
+    const el=document.getElementById(msgTarget); if(!el) return;
+    el.textContent=txt||''; el.className='acc-msg'+(kind?(' '+kind):'');
+  }
+  async function signIn(mode,src){
     if(!sb) return;
-    const email=document.getElementById('accEmailIn').value.trim();
-    const pass=document.getElementById('accPassIn').value;
-    if(!email||pass.length<6){ setAccMsg('Escribe tu correo y una contraseña de 6 caracteres o más.','warn'); return; }
-    setAccMsg('Conectando…');
+    const enWelcome = src==='wl';
+    msgTarget = enWelcome?'wlMsg':'accMsg';
+    const email=document.getElementById(enWelcome?'wlEmail':'accEmailIn').value.trim();
+    const passEl=document.getElementById(enWelcome?'wlPass':'accPassIn');
+    const pass=passEl.value;
+    if(!email||pass.length<6){ setMsg('Escribe tu correo y una contraseña de 6 caracteres o más.','warn'); return; }
+    setMsg('Conectando…');
     try{
       let r;
       if(mode==='up'){
-        r=await sb.auth.signUp({email,password:pass});
+        // la confirmación debe volver a la app, no a localhost
+        r=await sb.auth.signUp({email,password:pass,options:{emailRedirectTo:location.href.split('?')[0]}});
         if(r.error) throw r.error;
-        if(!r.data.session){ setAccMsg('Te hemos enviado un correo para confirmar la cuenta.','ok'); return; }
+        if(!r.data.session){
+          setMsg('Te hemos enviado un correo a '+email+'. Ábrelo y pulsa el enlace para activar la cuenta.','ok');
+          return;
+        }
       } else {
         r=await sb.auth.signInWithPassword({email,password:pass});
         if(r.error) throw r.error;
       }
-      authSession=r.data.session; setAccMsg('');
-      document.getElementById('accPassIn').value='';
+      authSession=r.data.session; setMsg('');
+      passEl.value='';
       markWelcome();
+      document.getElementById('welcome').classList.remove('open');
       await pullRemote(true);
-      if(!S._first){ S._first=Date.now(); save(); }   // cuenta nueva: empieza la prueba
-      renderAccount(); renderPay(); renderAll();
+      if(!S._first){ S._first=Date.now(); }
+      if(!S._ref){ const rf=pendingRef(); if(rf){ S._ref=rf; clearPendingRef(); } }
+      save();
+      renderAccount(); renderPay(); renderAll(); renderInvite();
       toast(trialLeft()>0 ? ('¡Listo! Tienes '+trialLeft()+' días de prueba') : 'Sesión iniciada');
+      if(mode==='up') setTimeout(()=>{ closePay(); openSheet(); },700);   // ahora sí, el perfil
     }catch(e){
       const m=(e&&e.message)||'';
-      setAccMsg(/Invalid login/i.test(m)?'Correo o contraseña incorrectos.':
-               (/already registered/i.test(m)?'Ese correo ya tiene cuenta: pulsa Entrar.':('No se pudo: '+m)),'warn');
+      setMsg(/Invalid login/i.test(m)?'Correo o contraseña incorrectos.':
+             (/already registered|already been/i.test(m)?'Ese correo ya tiene cuenta: pulsa «Entra aquí».':
+             (/Email not confirmed/i.test(m)?'Confirma primero el correo que te hemos enviado.':('No se pudo: '+m))),'warn');
     }
   }
 
@@ -2319,9 +2445,10 @@
   }
 
   if(CLOUD_ON){
-    document.getElementById('accIn').addEventListener('click',()=>signIn('in'));
-    document.getElementById('accUp').addEventListener('click',()=>signIn('up'));
+    document.getElementById('accIn').addEventListener('click',()=>signIn('in','acc'));
+    document.getElementById('accUp').addEventListener('click',()=>signIn('up','acc'));
     document.getElementById('accOut').addEventListener('click',signOut);
+    document.getElementById('invShare').addEventListener('click',compartirInvite);
     document.getElementById('accNow').addEventListener('click',async()=>{ setAccMsg('Sincronizando…'); await pullRemote(true); setAccMsg(''); });
     window.addEventListener('online',()=>{ if(authSession) pushRemote(); });
   }

@@ -77,14 +77,33 @@ const SUPA_KEY='eyJhbGci...';
 
 Sube el archivo y listo: aparecerá la sección **Tu cuenta** dentro del perfil.
 
-## 5. Ajusta el correo de confirmación
+## 5. Configura la dirección de retorno (IMPORTANTE)
 
-Por defecto Supabase envía un correo para confirmar la cuenta. Dos opciones:
+Sin este paso, el enlace del correo de confirmación lleva a `http://localhost:3000` y el usuario ve **«Safari no puede conectar con el servidor»**.
 
-- **Dejarlo activado** (recomendado): más seguro, pero el usuario debe abrir su correo antes de entrar.
-- **Desactivarlo** para que sea inmediato: **Authentication → Providers → Email** y desactiva *Confirm email*.
+En Supabase → **Authentication** → **URL Configuration**:
 
-Ojo con el límite de correos del plan gratuito (unos pocos por hora). Si esto crece, conecta un servicio de envío propio en **Authentication → Emails → SMTP**.
+- **Site URL**: `https://dasogu92.github.io/Entreno/`
+- **Redirect URLs**: añade también `https://dasogu92.github.io/Entreno/**`
+
+Guarda. A partir de ahí, quien confirme su correo aterriza en la app.
+
+## 6. Decide si quieres confirmación por correo
+
+En **Authentication → Providers → Email**, la opción *Confirm email*:
+
+- **Activada** (por defecto): más segura, pero el usuario tiene que salir de la app, abrir su correo y volver. Se pierde gente por el camino.
+- **Desactivada**: entra al instante. Para una app entre amigos es perfectamente razonable, y es lo que yo haría al principio.
+
+Ten en cuenta que el plan gratuito limita bastante los correos por hora. Si más adelante crece, conecta tu propio servicio de envío en **Authentication → Emails → SMTP**.
+
+## Invitaciones
+
+Cada usuario tiene un código de 6 letras y un enlace del tipo `.../Entreno/?ref=ABC123`. Quien entre por ahí se lleva el doble de días de prueba, automáticamente.
+
+Para ver quién ha invitado a quién, entra en **Table Editor → user_data** y mira el campo `_ref` dentro de la columna `data`. Ahí aparece el código de quien le invitó.
+
+La recompensa del que invita (un mes gratis por amigo suscrito) **es manual de momento**: cuando veas en Stripe que alguien se suscribe y en Supabase que venía invitado, alarga a mano la fecha de `premium_until` del que le invitó. Automatizarlo requiere ampliar la función del webhook, y no merece la pena hasta que haya volumen.
 
 ## Cómo funciona la sincronización
 
