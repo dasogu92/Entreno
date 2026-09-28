@@ -521,14 +521,81 @@
   .promo-new{font-family:'Archivo';font-weight:800;font-size:19px;color:var(--done);}
   .promo-foot{font-size:10.5px;color:var(--muted2);margin-top:8px;}
   .pay-price-row b{font-size:19px;}
+
+  /* ====== PANTALLA DE BIENVENIDA ====== */
+  .welcome{position:fixed;inset:0;z-index:90;background:var(--ink);display:none;overflow-y:auto;
+    padding:calc(28px + env(safe-area-inset-top)) 24px calc(28px + env(safe-area-inset-bottom));}
+  .welcome.open{display:block;animation:rise .45s cubic-bezier(.2,.8,.3,1);}
+  .welcome::before{content:'';position:fixed;top:-160px;right:-120px;width:420px;height:420px;border-radius:50%;
+    background:radial-gradient(circle,rgba(255,90,31,.22),transparent 70%);pointer-events:none;}
+  .wl-inner{max-width:420px;margin:0 auto;position:relative;text-align:center;}
+  .wl-icon{width:76px;height:76px;border-radius:19px;box-shadow:0 12px 34px rgba(0,0,0,.5);}
+  .wl-title{font-family:'Archivo';font-weight:900;font-size:36px;line-height:.9;margin:16px 0 0;letter-spacing:-.02em;}
+  .wl-title span{display:block;font-size:12px;font-weight:800;letter-spacing:.24em;text-transform:uppercase;
+    color:var(--effort);margin-top:5px;}
+  .wl-lede{color:var(--muted);font-size:14.5px;margin:12px 0 22px;line-height:1.45;}
+  .wl-list{list-style:none;padding:0;margin:0 0 20px;text-align:left;}
+  .wl-list li{display:flex;flex-direction:column;padding:12px 0 12px 30px;border-bottom:1px solid var(--line);position:relative;}
+  .wl-list li:last-child{border-bottom:none;}
+  .wl-list li::before{content:'';position:absolute;left:5px;top:17px;width:12px;height:6px;
+    border-left:2.4px solid var(--effort);border-bottom:2.4px solid var(--effort);transform:rotate(-45deg);}
+  .wl-list b{font-size:14.5px;}
+  .wl-list span{font-size:12px;color:var(--muted);margin-top:2px;}
+  .wl-trial{background:linear-gradient(135deg,rgba(194,230,37,.14),rgba(244,180,0,.08));
+    border:1px solid var(--done);border-radius:12px;padding:13px;font-size:13px;color:var(--done);margin-bottom:18px;}
+  .wl-trial b{font-weight:800;}
+  .wl-skip{width:100%;background:none;border:none;color:var(--muted2);font-size:13px;font-weight:600;
+    padding:16px;margin-top:4px;text-decoration:underline;}
+
+  /* el botón principal también fuera de las hojas */
+  .welcome .save-profile{width:100%;background:linear-gradient(135deg,#d4ff3d,#8fc400);border:none;color:var(--ink);
+    font-weight:800;font-size:15.5px;padding:16px;border-radius:12px;box-shadow:0 8px 24px rgba(194,230,37,.22);}
+  .welcome .save-profile:active{transform:scale(.98);}
+
+  /* ====== TARJETA DE INSTALACIÓN (abajo, no molesta) ====== */
+  .install-bar{position:fixed;top:auto;left:14px;right:14px;bottom:calc(84px + env(safe-area-inset-bottom));z-index:42;
+    display:none;flex-direction:column;gap:12px;padding:16px;border-radius:16px;
+    background:linear-gradient(168deg,#232a30,#171b1f);border:1px solid var(--line2);
+    box-shadow:0 14px 40px rgba(0,0,0,.55);max-width:512px;margin:0 auto;}
+  .install-bar.show{display:flex;animation:slideUp .5s cubic-bezier(.2,.9,.3,1);}
+  @keyframes slideUp{from{transform:translateY(130%);opacity:0;}to{transform:translateY(0);opacity:1;}}
+  .ib-top{display:flex;align-items:center;gap:13px;}
+  .ib-icon{width:46px;height:46px;border-radius:12px;flex-shrink:0;}
+  .ib-txt{display:flex;flex-direction:column;min-width:0;}
+  .ib-txt b{font-size:14.5px;font-weight:700;line-height:1.2;}
+  .ib-txt span{font-size:11.5px;color:var(--muted);line-height:1.35;margin-top:3px;}
+  .ib-btn{display:flex;align-items:center;justify-content:center;gap:9px;width:100%;
+    background:linear-gradient(135deg,#ff8a1f,#ff3d00);border:none;color:var(--ink);
+    font-weight:800;font-size:14.5px;padding:13px;border-radius:11px;box-shadow:0 6px 18px rgba(255,90,31,.3);}
+  .ib-btn svg{width:17px;height:17px;}
+  .ib-btn:active{transform:scale(.98);}
+  .ib-x{position:absolute;top:8px;right:10px;background:none;border:none;color:var(--muted2);font-size:14px;padding:6px;}
+  body.has-bar{padding-top:0;}
+  /* pasos con icono */
+  .istep .in{width:30px;height:30px;border-radius:9px;background:var(--panel3);color:var(--effort);
+    display:flex;align-items:center;justify-content:center;font-size:13px;}
+  .istep .in svg{width:16px;height:16px;}
+  .ios-hint{display:flex;align-items:center;gap:8px;justify-content:center;background:var(--panel2);
+    border:1px solid var(--line);border-radius:10px;padding:11px;margin-top:14px;font-size:12px;color:var(--muted);}
+  .ios-hint svg{width:16px;height:16px;color:var(--sky);flex-shrink:0;}
+
+  #iosBg{z-index:62;} #iosSheet{z-index:63;}
 </style>
 </head>
 <body>
 <div class="install-bar" id="installBar">
-  <div class="ib-icon"><img src="icon-192.png" alt=""></div>
-  <div class="ib-txt"><b>Instala Fitness de semana</b><span id="ibSub">Tenla como app, funciona sin conexión</span></div>
-  <button class="ib-btn" id="installBtn">Instalar</button>
   <button class="ib-x" id="installClose" aria-label="Ahora no">✕</button>
+  <div class="ib-top">
+    <img src="icon-192.png" alt="" class="ib-icon">
+    <div class="ib-txt">
+      <b>Tenla siempre a mano</b>
+      <span id="ibSub">Añádela a tu pantalla de inicio y funcionará sin conexión</span>
+    </div>
+  </div>
+  <button class="ib-btn" id="installBtn">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2"/></svg>
+    <span id="ibBtnTxt">Instalar app</span>
+  </button>
 </div>
 
 <div class="sheet-bg" id="iosBg"></div>
@@ -809,6 +876,23 @@
   <button class="save-profile" id="demoOk">Entendido</button>
 </div>
 
+<div class="welcome" id="welcome">
+  <div class="wl-inner">
+    <img src="icon-192.png" alt="" class="wl-icon">
+    <h1 class="wl-title">Fitness<span>de semana</span></h1>
+    <p class="wl-lede">Entrena, come y compensa los excesos del finde.</p>
+    <ul class="wl-list">
+      <li><b>Entreno guiado</b><span>40-45 min con vídeo de cada ejercicio</span></li>
+      <li><b>Menú y compra</b><span>Qué comer cada día y qué necesitas</span></li>
+      <li><b>Compensa excesos</b><span>Cervezas y caprichos, con su factura</span></li>
+    </ul>
+    <div class="wl-trial" id="wlTrial">Crea tu cuenta y llévate <b>7 días con todo desbloqueado</b></div>
+    <button class="save-profile" id="wlSignup">Crear cuenta gratis</button>
+    <button class="btn-sec" id="wlLogin" style="width:100%;margin-top:9px;">Ya tengo cuenta</button>
+    <button class="wl-skip" id="wlSkip">Probar sin cuenta</button>
+    <p class="note" id="wlNote" style="text-align:center;">Con cuenta no pierdes tu progreso aunque cambies de móvil.</p>
+  </div>
+</div>
 <div class="sheet-bg" id="payBg"></div>
 <div class="sheet" id="paySheet">
 <div class="grab"></div>
@@ -1373,8 +1457,8 @@
   /* ===== CONFIGURACIÓN DE LA NUBE (opcional) =====
      Rellena estos dos valores con los de tu proyecto de Supabase para activar
      cuentas y sincronización. Si los dejas vacíos, la app funciona en local igual que siempre. */
-  const SUPA_URL='';
-  const SUPA_KEY='';
+  const SUPA_URL='https://jmfnxebzpmwcbuacymrd.supabase.co';
+  const SUPA_KEY='sb_publishable_dwR1M7I7V-ntZsUdghE7nw_k1FPXdS8';
   const CLOUD_ON = !!(SUPA_URL && SUPA_KEY);
 
   /* ===== SUSCRIPCIÓN =====
@@ -1391,6 +1475,11 @@
     PROMO: { CODE: 'FUNDADORES', OFF: '30 %', PRICE: '4,89 €/mes', PLAZO: 'el primer año' }
   };
   const PAY_ON = !!PAY.CHECKOUT_URL;
+
+  /* Cuenta obligatoria para usar la app.
+     true  = hay que registrarse (recomendado: no se pierden datos y los tienes localizados)
+     false = se puede entrar como invitado con la versión gratuita */
+  const REQUIRE_ACCOUNT = true;
 
   const KEY='fds-store-v1';
   const OLD_KEYS=['mamadofit-store-v1','recomp-store-v3'];   // migración desde nombres anteriores
@@ -1980,13 +2069,48 @@
   document.getElementById('pSkip').addEventListener('click',advance);
   document.getElementById('pClose').addEventListener('click',()=>{ if(confirm('¿Salir del entrenamiento? Se guarda lo que ya has completado.')) closePlayer(); });
 
+  /* ===== BIENVENIDA Y REGISTRO INICIAL ===== */
+  const WELCOME_KEY='fds-welcome-done';
+  function welcomeSeen(){ try{ return localStorage.getItem(WELCOME_KEY)==='1'; }catch(e){ return true; } }
+  function markWelcome(){ try{ localStorage.setItem(WELCOME_KEY,'1'); }catch(e){} }
+  function showWelcome(){
+    if(!CLOUD_ON) return;                       // sin nube no tiene sentido pedir cuenta
+    if(authSession) return;
+    if(!REQUIRE_ACCOUNT && welcomeSeen()) return;   // como invitado, solo la primera vez
+    const t=document.getElementById('wlTrial');
+    if(t) t.style.display = PAY_ON ? 'block' : 'none';
+    const skip=document.getElementById('wlSkip');
+    if(skip) skip.style.display = REQUIRE_ACCOUNT ? 'none' : 'block';
+    const nota=document.getElementById('wlNote');
+    if(nota) nota.textContent = REQUIRE_ACCOUNT
+      ? 'Necesitas una cuenta para guardar tu progreso. Es gratis y solo pide un correo.'
+      : 'Con cuenta no pierdes tu progreso aunque cambies de móvil.';
+    document.getElementById('welcome').classList.add('open');
+  }
+  function hideWelcome(goTo){
+    markWelcome();
+    document.getElementById('welcome').classList.remove('open');
+    setTimeout(()=>{ if(!isInstalled()) showInstallUI(); }, 900);
+    if(goTo){ setTimeout(()=>{ openSheet();
+      setTimeout(()=>{ const e=document.getElementById('accEmailIn'); if(e) e.focus(); },350); },200); }
+  }
+  if(CLOUD_ON){
+    document.getElementById('wlSignup').addEventListener('click',()=>{ vibe(12); hideWelcome(true); });
+    document.getElementById('wlLogin').addEventListener('click',()=>{ vibe(12); hideWelcome(true); });
+    document.getElementById('wlSkip').addEventListener('click',()=>{ vibe(10); hideWelcome(false); });
+  }
+
   /* ===== PLAN PRO / PRUEBA ===== */
+  // La prueba se cuenta desde el registro y viaja con la cuenta:
+  // así no se reinicia cambiando de móvil ni borrando los datos del navegador.
   function firstUse(){
-    if(!S._first){ S._first=Date.now(); writeStore(JSON.stringify(S)); }
-    return S._first;
+    if(!S._first && (!CLOUD_ON || authSession)){ S._first=Date.now(); writeStore(JSON.stringify(S)); }
+    return S._first||0;
   }
   function trialLeft(){
-    const ms=PAY.TRIAL_DAYS*86400000-(Date.now()-firstUse());
+    if(CLOUD_ON && !authSession) return 0;      // sin cuenta no hay prueba
+    const ini=firstUse(); if(!ini) return 0;
+    const ms=PAY.TRIAL_DAYS*86400000-(Date.now()-ini);
     return Math.max(0, Math.ceil(ms/86400000));
   }
   function isPro(){
@@ -2031,9 +2155,10 @@
   }
   function openPay(nombre){
     const s=document.getElementById('paySheet');
-    document.getElementById('payLede').textContent = nombre
-      ? ('«'+nombre+'» forma parte de Pro.')
-      : 'Tu prueba ha terminado.';
+    const sinCuenta = CLOUD_ON && !authSession;
+    document.getElementById('payLede').textContent = sinCuenta
+      ? 'Crea tu cuenta gratis y pruébalo todo '+PAY.TRIAL_DAYS+' días.'
+      : (nombre ? ('«'+nombre+'» forma parte de Pro.') : 'Tu prueba ha terminado.');
     document.getElementById('payPrice').textContent=PAY.PRICE;
     const promo=document.getElementById('payPromo');
     if(PAY.PROMO&&PAY.PROMO.CODE&&!isPro()){
@@ -2047,7 +2172,7 @@
       };
     } else promo.style.display='none';
     const go=document.getElementById('payGo');
-    go.textContent = (CLOUD_ON && !authSession) ? 'Crear cuenta y suscribirme' : 'Suscribirme';
+    go.textContent = sinCuenta ? ('Crear cuenta · '+PAY.TRIAL_DAYS+' días gratis') : 'Suscribirme';
     document.getElementById('payBg').classList.add('open'); s.classList.add('open');
   }
   function closePay(){ document.getElementById('payBg').classList.remove('open'); document.getElementById('paySheet').classList.remove('open'); }
@@ -2097,7 +2222,7 @@
       sb.auth.onAuthStateChange((_e,s)=>{ authSession=s; renderAccount(); });
       document.getElementById('accountCard').style.display='block';
       renderAccount();
-      if(authSession) await pullRemote(true);
+      if(authSession) await pullRemote(true); else showWelcome();
     }catch(e){ console.log('nube no disponible',e); }
   }
 
@@ -2135,8 +2260,11 @@
       }
       authSession=r.data.session; setAccMsg('');
       document.getElementById('accPassIn').value='';
-      await pullRemote(true); renderAccount();
-      toast('Sesión iniciada');
+      markWelcome();
+      await pullRemote(true);
+      if(!S._first){ S._first=Date.now(); save(); }   // cuenta nueva: empieza la prueba
+      renderAccount(); renderPay(); renderAll();
+      toast(trialLeft()>0 ? ('¡Listo! Tienes '+trialLeft()+' días de prueba') : 'Sesión iniciada');
     }catch(e){
       const m=(e&&e.message)||'';
       setAccMsg(/Invalid login/i.test(m)?'Correo o contraseña incorrectos.':
@@ -2149,6 +2277,7 @@
     await pushRemote();            // no perder lo último antes de salir
     await sb.auth.signOut();
     authSession=null; renderAccount(); toast('Sesión cerrada');
+    if(REQUIRE_ACCOUNT){ closeSheet(); setTimeout(showWelcome,300); }
   }
 
   // Sube los datos locales (con antirrebote para no llamar en cada toque)
@@ -2211,16 +2340,35 @@
   window.addEventListener('beforeinstallprompt',e=>{ e.preventDefault(); deferredPrompt=e; showInstallUI(); });
   window.addEventListener('appinstalled',()=>{ deferredPrompt=null; hideInstallBar(); toast('¡App instalada!'); });
 
+  // Cuenta visitas para no pedir la instalación nada más entrar
+  function bumpVisits(){
+    let n=0; try{ n=parseInt(localStorage.getItem('fds-visits')||'0')+1; localStorage.setItem('fds-visits',String(n)); }catch(e){}
+    return n;
+  }
+  const VISITS=bumpVisits();
+  function yaEntreno(){
+    return Object.keys(S.days||{}).some(k=>{const r=S.days[k];return r.ex&&r.ex.length&&r.ex.some(Boolean);});
+  }
+  function momentoBueno(){
+    // a partir de la segunda visita, o en cuanto ha usado un entreno
+    return VISITS>=2 || yaEntreno();
+  }
   function showInstallUI(){
     if(isInstalled()) return;
     if(localStorage.getItem('fds-install-dismissed')==='1'){ showProfileInstall(); return; }
+    showProfileInstall();
+    if(document.getElementById('welcome').classList.contains('open')) return;  // no pisar la bienvenida
+    if(!momentoBueno()) return;
     const bar=document.getElementById('installBar');
-    document.getElementById('ibSub').textContent = isIOS ? 'Añádela a tu pantalla de inicio' : 'Tenla como app, funciona sin conexión';
-    bar.classList.add('show'); document.body.classList.add('has-bar');
+    document.getElementById('ibSub').textContent = isIOS
+      ? 'Te enseño cómo en tres pasos. Funciona sin conexión.'
+      : 'Añádela a tu pantalla de inicio y funcionará sin conexión';
+    document.getElementById('ibBtnTxt').textContent = isIOS ? 'Ver cómo se añade' : 'Instalar app';
+    bar.classList.add('show');
     showProfileInstall();
   }
   function showProfileInstall(){ if(!isInstalled()) document.getElementById('installFromProfile').style.display='block'; }
-  function hideInstallBar(){ document.getElementById('installBar').classList.remove('show'); document.body.classList.remove('has-bar');
+  function hideInstallBar(){ document.getElementById('installBar').classList.remove('show');
     document.getElementById('installFromProfile').style.display='none'; }
 
   async function doInstall(){
@@ -2250,25 +2398,38 @@
             ['3','Compartir → Añadir a inicio','Con el botón de compartir de abajo.']];
     } else if(isIOS){
       lede.textContent='Tres pasos y la tendrás como una app más.';
-      list=[['1','Pulsa Compartir','El icono del cuadrado con la flecha hacia arriba, abajo en la barra de Safari.'],
-            ['2','«Añadir a pantalla de inicio»','Baja un poco en la lista de opciones hasta encontrarlo.'],
-            ['3','Pulsa «Añadir»','Arriba a la derecha. Listo: aparecerá el icono naranja.']];
+      list=[['1','Pulsa Compartir','El cuadrado con la flecha hacia arriba, en la barra de abajo de Safari.','share'],
+            ['2','«Añadir a pantalla de inicio»','Baja un poco en la lista de opciones hasta encontrarlo.','plus'],
+            ['3','Pulsa «Añadir»','Arriba a la derecha. Listo: ya la tienes con su icono.','ok']];
     } else if(isAndroid){
       lede.textContent='Desde el menú del navegador en dos toques.';
-      list=[['1','Abre el menú','Los tres puntos, arriba a la derecha.'],
-            ['2','«Instalar app»','O «Añadir a pantalla de inicio».'],
-            ['3','Confirma','Aparecerá el icono en tu pantalla.']];
+      list=[['1','Abre el menú','Los tres puntos, arriba a la derecha.','menu'],
+            ['2','«Instalar app»','O «Añadir a pantalla de inicio».','plus'],
+            ['3','Confirma','Aparecerá el icono en tu pantalla.','ok']];
     } else {
       lede.textContent='Desde la barra de direcciones de tu navegador.';
       list=[['1','Busca el icono de instalar','A la derecha de la barra de direcciones.'],
             ['2','Pulsa «Instalar»','También está en el menú del navegador.'],
             ['3','Ábrela como app','Se abrirá en su propia ventana.']];
     }
-    steps.innerHTML=list.map(s=>'<div class="istep"><span class="in">'+s[0]+'</span><div><b>'+s[1]+'</b><span>'+s[2]+'</span></div></div>').join('');
+    const ICON={
+      share:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V3m0 0L8 7m4-4l4 4"/><path d="M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/></svg>',
+      plus:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M12 8v8M8 12h8"/></svg>',
+      menu:'<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg>',
+      ok:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>'
+    };
+    steps.innerHTML=list.map(s=>'<div class="istep"><span class="in">'+(ICON[s[3]]||s[0])+'</span><div><b>'+s[1]+'</b><span>'+s[2]+'</span></div></div>').join('')+
+      (isIOS&&isSafari&&!inApp ? '<div class="ios-hint">El botón de Compartir está en la barra de abajo de Safari '+ICON.share+'</div>' : '');
+    document.getElementById('installBar').classList.remove('show');   // no estorbar encima
     document.getElementById('iosBg').classList.add('open');
     document.getElementById('iosSheet').classList.add('open');
   }
-  function closeIOS(){ document.getElementById('iosBg').classList.remove('open'); document.getElementById('iosSheet').classList.remove('open'); }
+  function closeIOS(){
+    document.getElementById('iosBg').classList.remove('open');
+    document.getElementById('iosSheet').classList.remove('open');
+    // si sigue sin instalar y no la ha descartado, la tarjeta vuelve más tarde
+    setTimeout(()=>{ if(!isInstalled()&&localStorage.getItem('fds-install-dismissed')!=='1') showInstallUI(); },600);
+  }
   document.getElementById('iosBg').addEventListener('click',closeIOS);
   document.getElementById('iosOk').addEventListener('click',closeIOS);
   document.getElementById('installBtn').addEventListener('click',doInstall);
