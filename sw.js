@@ -1,5 +1,5 @@
-/* mamadoFit service worker — offline app shell + runtime cache */
-const CACHE = 'mamadofit-v4';
+/* Fitness de semana service worker — offline app shell + runtime cache */
+const CACHE = 'fds-v2';
 const ASSETS = [
   './',
   './index.html',

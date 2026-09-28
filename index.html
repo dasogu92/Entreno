@@ -3,12 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no">
-<title>mamadoFit</title>
+<title>Fitness de semana</title>
 <meta name="theme-color" content="#0e1012">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="mamadoFit">
+<meta name="apple-mobile-web-app-title" content="Fitness de semana">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
@@ -48,8 +48,9 @@
   .bib::before,.bib::after{content:"";position:absolute;top:6px;width:6px;height:6px;border-radius:50%;background:var(--ink);opacity:.35;}
   .bib::before{left:7px;} .bib::after{right:7px;}
   .bib .num{font-family:'Archivo';font-weight:900;font-size:30px;} .bib .cap{font-size:8px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;margin-top:1px;opacity:.6;}
-  .brand h1{font-family:'Archivo';font-weight:900;font-size:27px;margin:0;line-height:.9;letter-spacing:-.02em;}
-  .brand h1 .fit{color:var(--effort);}
+  .brand h1{font-family:'Archivo';font-weight:900;font-size:26px;margin:0;line-height:.88;letter-spacing:-.02em;}
+  .brand h1 .fit{display:block;font-size:10.5px;font-weight:800;letter-spacing:.22em;text-transform:uppercase;
+    color:var(--effort);margin-top:3px;}
   .brand .date{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.09em;margin-top:5px;font-weight:600;}
   .gear{width:42px;height:42px;border-radius:11px;border:1px solid var(--line);background:var(--panel);color:var(--muted);display:flex;align-items:center;justify-content:center;}
   .gear:active{transform:scale(.94);} .gear svg{width:20px;height:20px;}
@@ -429,12 +430,41 @@
   /* el visor debe quedar por encima del reproductor a pantalla completa */
   #demoBg{z-index:64;} #demoSheet{z-index:65;}
   .toast{z-index:80;}
+
+  /* ====== ANIMACIÓN SIEMPRE VISIBLE ====== */
+  /* miniatura en la lista de ejercicios */
+  .exthumb{width:54px;height:54px;border-radius:11px;overflow:hidden;flex-shrink:0;padding:0;border:1px solid var(--line2);
+    background:#f3f4ef;position:relative;display:block;}
+  .exthumb.empty{background:var(--panel2);border-style:dashed;opacity:.45;}
+  .exthumb:active{transform:scale(.94);}
+  .demo-frames.thumb{aspect-ratio:1/1;}
+  .demo-frames.thumb .df{object-position:center;}
+  .row.on .exthumb{opacity:.45;}
+
+  /* animación dentro del reproductor */
+  .p-demo{width:min(300px,72vw);border-radius:16px;overflow:hidden;margin:0 0 16px;position:relative;
+    background:#f3f4ef;border:1px solid rgba(255,255,255,.1);box-shadow:0 10px 30px rgba(0,0,0,.45);cursor:pointer;}
+  .demo-frames.inplayer{aspect-ratio:4/3;}
+  .p-demo .demo-tag{bottom:7px;right:7px;}
+  /* con la animación presente, el anillo y el título se ajustan */
+  .p-ex{font-size:24px;margin-bottom:14px;max-width:320px;}
+  .p-ring{width:min(190px,48vw);height:min(190px,48vw);max-width:none;max-height:none;}
+  .p-time{font-size:46px;}
+  .p-reps{font-size:46px;}
+  .p-repslbl{font-size:11px;margin-top:4px;}
+  .p-next{margin-top:16px;}
+  @media (max-height:700px){
+    .p-demo{width:min(230px,56vw);margin-bottom:10px;}
+    .p-ring{width:min(150px,40vw);height:min(150px,40vw);}
+    .p-time,.p-reps{font-size:36px;}
+    .p-ex{font-size:20px;margin-bottom:10px;}
+  }
 </style>
 </head>
 <body>
 <div class="install-bar" id="installBar">
   <div class="ib-icon"><img src="icon-192.png" alt=""></div>
-  <div class="ib-txt"><b>Instala mamadoFit</b><span id="ibSub">Tenla como app, funciona sin conexión</span></div>
+  <div class="ib-txt"><b>Instala Fitness de semana</b><span id="ibSub">Tenla como app, funciona sin conexión</span></div>
   <button class="ib-btn" id="installBtn">Instalar</button>
   <button class="ib-x" id="installClose" aria-label="Ahora no">✕</button>
 </div>
@@ -455,7 +485,7 @@
   <header class="top">
     <div class="brand">
       <div class="bib"><span class="num" id="streakNum">0</span><span class="cap">Racha</span></div>
-      <div><h1 class="cond">mamado<span class="fit">Fit</span></h1><div class="date" id="todayDate">—</div></div>
+      <div><h1 class="cond">Fitness<span class="fit">de semana</span></h1><div class="date" id="todayDate">—</div></div>
     </div>
     <button class="gear" id="openProfile" aria-label="Perfil">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
@@ -720,6 +750,7 @@
   <div class="p-mid" id="pMid">
     <div id="pActive">
       <div class="p-ex" id="pEx">—</div>
+      <div class="p-demo" id="pDemoBox"></div>
       <div class="p-ring">
         <svg width="250" height="250" viewBox="0 0 250 250">
           <circle cx="125" cy="125" r="112" fill="none" stroke="var(--panel3)" stroke-width="12"/>
@@ -1252,8 +1283,8 @@
   const SUPA_KEY='';
   const CLOUD_ON = !!(SUPA_URL && SUPA_KEY);
 
-  const KEY='mamadofit-store-v1';
-  const OLD_KEYS=['recomp-store-v3'];   // migración desde el nombre anterior
+  const KEY='fds-store-v1';
+  const OLD_KEYS=['mamadofit-store-v1','recomp-store-v3'];   // migración desde nombres anteriores
   let S={profile:{weight:null,height:null,age:null,sex:'m',goal:'recomp',intens:'normal'},days:{}};
 
   function pad(n){return String(n).padStart(2,'0');}
@@ -1420,11 +1451,13 @@
       const showLoad = ex.mode==='reps';
       const demo = hasDemo(ex.nm);
       row.innerHTML=(isT?'<span class="dotmark"></span>':'<button class="chk" aria-label="Marcar"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></button>')+
-        '<div class="body"><div class="nm">'+ex.nm+(demo?' <span class="demo-dot" aria-label="Ver cómo se hace">?</span>':'')+'</div>'+(showLoad?('<div class="exload">'+loadChip(ex.nm)+'</div>'):'')+'</div><div class="sets">'+detail+'</div>';
+        (demo?('<button class="exthumb" aria-label="Ver cómo se hace">'+demoFrames(ex.nm,'thumb')+'</button>'):'<span class="exthumb empty"></span>')+
+        '<div class="body"><div class="nm">'+ex.nm+'</div>'+(showLoad?('<div class="exload">'+loadChip(ex.nm)+'</div>'):'')+'</div><div class="sets">'+detail+'</div>';
       if(!isT) row.querySelector('.chk').addEventListener('click',e=>{tap(e.currentTarget);rec.ex[i]=!rec.ex[i];save();renderEntreno();renderHeader();renderElevation();});
       const lb=row.querySelector('.loadbtn'); if(lb) lb.addEventListener('click',()=>{ vibe(12); openLoad(ex.nm); });
-      const dd=row.querySelector('.demo-dot'); if(dd) dd.addEventListener('click',e=>{ e.stopPropagation(); openDemo(ex.nm); });
+      const th=row.querySelector('.exthumb'); if(th&&demo) th.addEventListener('click',e=>{ e.stopPropagation(); openDemo(ex.nm); });
       list.appendChild(row); });
+    wireFallback(list);
   }
 
 
@@ -1741,12 +1774,20 @@
       document.getElementById('pEx').textContent='¿Listo?';
       document.getElementById('pNext').innerHTML='Empieza: <b>'+ph.name+'</b>';
     } else {
-      document.getElementById('pEx').innerHTML=ph.name+(hasDemo(ph.name)?' <span class="demo-dot big" id="pDemo">?</span>':'');
-      const pd=document.getElementById('pDemo'); if(pd) pd.addEventListener('click',()=>openDemo(ph.name));
+      document.getElementById('pEx').textContent=ph.name;
       const pl=lastLoad(ph.name);
       document.getElementById('pNext').innerHTML='Serie <b>'+ph.set+' / '+ph.sets+'</b>'+
         (pl?(' &nbsp;·&nbsp; <span style="color:var(--sky)">última: '+pl.kg+' kg</span>'):'');
     }
+    // animación siempre visible: del ejercicio actual, o del siguiente si estamos descansando
+    const demoName = (ph.kind==='work')?ph.name:((ph.kind==='rest'||ph.kind==='prep')?ph.name:null);
+    const box=document.getElementById('pDemoBox');
+    if(demoName&&hasDemo(demoName)){
+      box.style.display='block';
+      box.innerHTML=demoFrames(demoName,'inplayer')+(ph.kind!=='work'?'<span class="demo-tag">Siguiente</span>':'');
+      wireFallback(box);
+      box.onclick=()=>openDemo(demoName);
+    } else { box.style.display='none'; box.innerHTML=''; box.onclick=null; }
     sRemain=ph.dur;
     renderCenter(ph);
     updateProgress();
@@ -1950,7 +1991,7 @@
 
   function showInstallUI(){
     if(isInstalled()) return;
-    if(localStorage.getItem('mamadofit-install-dismissed')==='1'){ showProfileInstall(); return; }
+    if(localStorage.getItem('fds-install-dismissed')==='1'){ showProfileInstall(); return; }
     const bar=document.getElementById('installBar');
     document.getElementById('ibSub').textContent = isIOS ? 'Añádela a tu pantalla de inicio' : 'Tenla como app, funciona sin conexión';
     bar.classList.add('show'); document.body.classList.add('has-bar');
@@ -2011,7 +2052,7 @@
   document.getElementById('installBtn').addEventListener('click',doInstall);
   document.getElementById('installFromProfile').addEventListener('click',()=>{ closeSheet(); setTimeout(doInstall,260); });
   document.getElementById('installClose').addEventListener('click',()=>{
-    try{ localStorage.setItem('mamadofit-install-dismissed','1'); }catch(e){}
+    try{ localStorage.setItem('fds-install-dismissed','1'); }catch(e){}
     hideInstallBar(); showProfileInstall(); });
 
   // iOS no emite beforeinstallprompt: mostramos la barra igualmente
@@ -2021,21 +2062,29 @@
 
   /* ===== VISOR DE EJERCICIO ===== */
   function hasDemo(nm){ return !!EXDEMO[nm]; }
+  // fotogramas animados reutilizables (lista, reproductor y ficha)
+  function demoFrames(nm,cls){
+    const id=EXDEMO[nm]; if(!id) return '';
+    return '<div class="demo-frames '+(cls||'')+'">'+
+      '<img class="df f0" src="'+EXDB+id+'/0.jpg" alt="" loading="lazy" data-alt="'+EXDB_ALT+id+'/0.jpg">'+
+      '<img class="df f1" src="'+EXDB+id+'/1.jpg" alt="" loading="lazy" data-alt="'+EXDB_ALT+id+'/1.jpg">'+
+      '</div>';
+  }
+  // reintento desde GitHub si el CDN falla
+  function wireFallback(root){
+    (root||document).querySelectorAll('.demo-frames img').forEach(im=>{
+      if(im.dataset.wired) return; im.dataset.wired='1';
+      im.addEventListener('error',()=>{ const a=im.dataset.alt; if(a&&im.src!==a) im.src=a; },{once:true});
+    });
+  }
   function openDemo(nm){
     const id=EXDEMO[nm]; if(!id) return;
     vibe(12);
     document.getElementById('demoTitle').textContent=nm;
-    document.getElementById('demoStage').innerHTML=
-      '<div class="demo-frames">'+
-      '<img class="df f0" src="'+EXDB+id+'/0.jpg" alt="" loading="lazy" data-alt="'+EXDB_ALT+id+'/0.jpg">'+
-      '<img class="df f1" src="'+EXDB+id+'/1.jpg" alt="" loading="lazy" data-alt="'+EXDB_ALT+id+'/1.jpg">'+
-      '<span class="demo-tag">Inicio · Final</span></div>';
+    document.getElementById('demoStage').innerHTML=demoFrames(nm)+'<span class="demo-tag">Inicio · Final</span>';
     document.getElementById('demoCue').textContent=EXCUE[id]||'';
     document.getElementById('demoMeta').innerHTML='<span class="ing">Imágenes de free-exercise-db (dominio público)</span>';
-    // si el CDN falla, reintenta desde GitHub
-    document.querySelectorAll('.demo-frames img').forEach(im=>{
-      im.addEventListener('error',()=>{ const a=im.dataset.alt; if(a&&im.src!==a) im.src=a; },{once:true});
-    });
+    wireFallback(document.getElementById('demoStage'));
     document.getElementById('demoBg').classList.add('open');
     document.getElementById('demoSheet').classList.add('open');
   }
