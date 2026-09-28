@@ -459,6 +459,33 @@
     .p-time,.p-reps{font-size:36px;}
     .p-ex{font-size:20px;margin-bottom:10px;}
   }
+
+  /* ====== POSICIÓN FIJA DEL CÍRCULO ====== */
+  /* el título ocupa siempre dos líneas y el pie una: así nada empuja al anillo */
+  .p-ex{min-height:2.1em;display:flex;align-items:center;justify-content:center;text-align:center;}
+  .p-next{min-height:19px;display:flex;align-items:center;justify-content:center;}
+  .p-demo.blank{display:flex;align-items:center;justify-content:center;background:var(--panel2);
+    border:1px dashed var(--line2);box-shadow:none;cursor:default;aspect-ratio:4/3;}
+  .p-demo.blank .blank-ic{font-size:44px;opacity:.3;filter:grayscale(1);}
+  #pActive{justify-content:center;}
+
+  /* el pie ocupa siempre exactamente una línea */
+  .p-next{height:20px;min-height:20px;max-width:88vw;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;
+    display:block;text-align:center;line-height:20px;}
+  /* el título nunca pasa de dos líneas */
+  .p-ex{height:2.1em;min-height:2.1em;max-height:2.1em;overflow:hidden;}
+
+  /* altura calculada en vez de proporción: elimina el redondeo subpíxel */
+  .p-demo{height:calc(min(300px,72vw) * 0.75);}
+  .p-demo.blank{aspect-ratio:auto;height:calc(min(300px,72vw) * 0.75);}
+  .demo-frames.inplayer{aspect-ratio:auto;height:100%;}
+  @media (max-height:700px){
+    .p-demo,.p-demo.blank{height:calc(min(230px,56vw) * 0.75);}
+  }
+
+  /* en descanso el anillo también va en verde */
+  .player.rest #pRingFill{stroke:var(--done);}
+  .player.prep #pRingFill{stroke:var(--gold);}
 </style>
 </head>
 <body>
@@ -1783,11 +1810,17 @@
     const demoName = (ph.kind==='work')?ph.name:((ph.kind==='rest'||ph.kind==='prep')?ph.name:null);
     const box=document.getElementById('pDemoBox');
     if(demoName&&hasDemo(demoName)){
-      box.style.display='block';
+      box.className='p-demo';
       box.innerHTML=demoFrames(demoName,'inplayer')+(ph.kind!=='work'?'<span class="demo-tag">Siguiente</span>':'');
       wireFallback(box);
       box.onclick=()=>openDemo(demoName);
-    } else { box.style.display='none'; box.innerHTML=''; box.onclick=null; }
+    } else {
+      // sin demostración: mantenemos el mismo hueco para que el círculo no se mueva
+      box.className='p-demo blank';
+      const ic = ph.kind==='rest' ? '&#9203;' : (/estiram|movilid|calentam|relaj|respir|yoga|saludo|postura|gato/i.test(demoName||'') ? '&#129496;' : '&#128170;');
+      box.innerHTML='<span class="blank-ic">'+ic+'</span>';
+      box.onclick=null;
+    }
     sRemain=ph.dur;
     renderCenter(ph);
     updateProgress();
