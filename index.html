@@ -599,6 +599,18 @@
   .inv-link{display:block;font-size:10.5px;color:var(--muted2);word-break:break-all;}
   #inviteCard .save-profile{width:100%;background:linear-gradient(135deg,#d4ff3d,#8fc400);border:none;color:var(--ink);
     font-weight:800;font-size:15px;padding:14px;border-radius:12px;}
+
+  /* ====== BOTÓN DE CIERRE DE LAS HOJAS ====== */
+  .sheet-x{position:absolute;top:12px;right:14px;z-index:3;width:32px;height:32px;border-radius:50%;
+    border:1px solid var(--line2);background:var(--panel2);color:var(--muted);
+    display:flex;align-items:center;justify-content:center;padding:0;}
+  .sheet-x svg{width:14px;height:14px;}
+  .sheet-x:active{transform:scale(.9);background:var(--effort);color:var(--ink);border-color:var(--effort);}
+  .sheet h3,.sheet .ios-head,.sheet .pay-hero{padding-right:34px;}
+  .grab{cursor:grab;position:relative;z-index:2;padding:0;height:4px;}
+  .sheet::before{content:'';position:absolute;top:0;left:0;right:0;height:46px;}
+
+  nav.bottom .navbtn[data-tab="comida"] svg{stroke:none;fill:currentColor;}
 </style>
 </head>
 <body>
@@ -635,8 +647,8 @@
       <div class="bib"><span class="num" id="streakNum">0</span><span class="cap">Racha</span></div>
       <div><h1 class="cond">Fitness<span class="fit">de semana</span></h1><div class="date" id="todayDate">—</div></div>
     </div>
-    <button class="gear" id="openProfile" aria-label="Perfil">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    <button class="gear" id="openProfile" aria-label="Tu perfil">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.6"/><path d="M4.5 20.5a7.5 7.5 0 0 1 15 0"/></svg>
     </button>
   </header>
 
@@ -789,7 +801,7 @@
 
   <nav class="bottom">
     <button class="navbtn active" data-tab="entreno"><svg viewBox="0 0 24 24"><path d="M6 7v10M18 7v10M6 12h12M3 9v6M21 9v6"/></svg><span class="t">Entrenar</span></button>
-    <button class="navbtn" data-tab="comida"><svg viewBox="0 0 24 24"><path d="M4 3v7a3 3 0 0 0 3 3v8M8 3v7M6 3v7M17 3c-1.5 0-3 1.5-3 5s1.5 5 3 5v6"/></svg><span class="t">Comer</span></button>
+    <button class="navbtn" data-tab="comida"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M13.6 3.3c2.8-2 6.6.2 6.9 3.6.3 3.1-2.3 5.9-5.4 5.6-.9-.1-1.6.2-2.2.8l-2.4 2.4-2.4-2.4 2.4-2.4c.6-.6.9-1.3.8-2.2-.2-2.3 1-4.3 2.3-5.4z"/><circle cx="6.1" cy="16.9" r="2.7"/><circle cx="3.9" cy="19.1" r="2.7"/></svg><span class="t">Comer</span></button>
     <button class="navbtn" data-tab="compensar"><svg viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h12"/><circle cx="19" cy="18" r="2.5"/></svg><span class="t">Compensar</span><span class="badge" id="navBadge" style="display:none;">0</span></button>
     <button class="navbtn" data-tab="progreso"><svg viewBox="0 0 24 24"><path d="M3 3v18h18M7 14l4-4 3 3 5-6"/></svg><span class="t">Progreso</span></button>
   </nav>
@@ -2593,7 +2605,7 @@
     document.getElementById('demoTitle').textContent=nm;
     document.getElementById('demoStage').innerHTML=demoFrames(nm)+'<span class="demo-tag">Inicio · Final</span>';
     document.getElementById('demoCue').textContent=EXCUE[id]||'';
-    document.getElementById('demoMeta').innerHTML='<span class="ing">Imágenes de free-exercise-db (dominio público)</span>';
+    document.getElementById('demoMeta').innerHTML='';
     wireFallback(document.getElementById('demoStage'));
     document.getElementById('demoBg').classList.add('open');
     document.getElementById('demoSheet').classList.add('open');
@@ -2807,8 +2819,54 @@
 
   let tt=null; function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('show'),1600);}
 
+
+  /* ===== CERRAR HOJAS: botón X y arrastrar hacia abajo ===== */
+  function initSheets(){
+    const MAPA={
+      sheet:closeSheet, loadSheet:closeLoad, swapSheet:closeSwap, wswapSheet:closeWSwap,
+      demoSheet:closeDemo, paySheet:closePay, iosSheet:closeIOS
+    };
+    Object.keys(MAPA).forEach(id=>{
+      const el=document.getElementById(id); if(!el) return;
+      const cerrar=()=>{ el.style.transition=''; el.style.transform=''; MAPA[id](); };
+
+      // botón X
+      if(!el.querySelector('.sheet-x')){
+        const x=document.createElement('button');
+        x.className='sheet-x'; x.setAttribute('aria-label','Cerrar');
+        x.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>';
+        x.addEventListener('click',e=>{ e.stopPropagation(); vibe(10); cerrar(); });
+        el.insertBefore(x, el.firstChild);
+      }
+
+      // arrastrar hacia abajo
+      let y0=null, dy=0, arrastrando=false;
+      el.addEventListener('touchstart',e=>{
+        if(el.scrollTop>0) return;                 // si está desplazada, primero se sube
+        y0=e.touches[0].clientY; dy=0; arrastrando=true;
+        el.style.transition='none';
+      },{passive:true});
+      el.addEventListener('touchmove',e=>{
+        if(!arrastrando||y0===null) return;
+        dy=e.touches[0].clientY-y0;
+        if(dy<0){ dy=0; return; }
+        if(el.scrollTop>0){ arrastrando=false; el.style.transform=''; return; }
+        el.style.transform='translate(-50%,'+dy+'px)';
+      },{passive:true});
+      const soltar=()=>{
+        if(!arrastrando) return;
+        arrastrando=false; y0=null;
+        el.style.transition='transform .28s cubic-bezier(.2,.8,.3,1)';
+        if(dy>95){ vibe(10); el.style.transform='translate(-50%,100%)'; setTimeout(cerrar,240); }
+        else el.style.transform='translate(-50%,0)';
+      };
+      el.addEventListener('touchend',soltar);
+      el.addEventListener('touchcancel',soltar);
+    });
+  }
+
   function renderAll(){ firstUse(); renderHeader(); renderElevation(); renderEntreno(); updateBadge(); renderPay(); }
-  async function init(){ await load(); renderAll(); initCloud(); }
+  async function init(){ await load(); renderAll(); initSheets(); initCloud(); }
   init();
 })();
 </script>

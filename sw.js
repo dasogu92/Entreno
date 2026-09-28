@@ -1,5 +1,5 @@
 /* Fitness de semana service worker — offline app shell + runtime cache */
-const CACHE = 'fds-v11';
+const CACHE = 'fds-v12';
 const ASSETS = [
   './',
   './index.html',
