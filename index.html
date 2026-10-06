@@ -692,6 +692,20 @@
     color:var(--muted2);display:flex;align-items:center;justify-content:center;flex-shrink:0;padding:0;margin-left:2px;}
   .soc-del svg{width:11px;height:11px;}
   .soc-del:active{background:var(--effort);color:var(--ink);border-color:var(--effort);}
+
+  /* ====== AVISO DE NUEVA VERSIÓN ====== */
+  .update-bar{position:fixed;left:14px;right:14px;top:calc(10px + env(safe-area-inset-top));z-index:95;
+    display:none;align-items:center;gap:12px;padding:13px 14px;border-radius:14px;max-width:512px;margin:0 auto;
+    background:linear-gradient(135deg,#d4ff3d,#8fc400);color:var(--ink);
+    box-shadow:0 12px 34px rgba(0,0,0,.5);animation:slideDown .45s cubic-bezier(.2,.8,.3,1);}
+  .update-bar.show{display:flex;}
+  .up-txt{flex:1;min-width:0;display:flex;flex-direction:column;}
+  .up-txt b{font-size:13.5px;font-weight:800;line-height:1.2;}
+  .up-txt span{font-size:11px;opacity:.75;margin-top:2px;}
+  .up-btn{background:var(--ink);border:none;color:var(--done);font-weight:800;font-size:13px;
+    padding:9px 15px;border-radius:9px;flex-shrink:0;}
+  .up-btn:active{transform:scale(.95);}
+  .up-x{background:none;border:none;color:rgba(14,16,18,.5);font-size:14px;padding:4px;flex-shrink:0;}
 </style>
 </head>
 <body>
@@ -973,6 +987,7 @@
       <button class="btn-sec" id="importData">Importar copia</button>
     </div>
     <button class="danger" id="resetAll">Borrar todos los datos</button>
+    <p class="note" style="text-align:center;margin-top:16px;">Versión <b id="appVer">—</b> · <span id="verState">comprobando…</span></p>
     <p class="note" style="text-align:center;">Tus objetivos de kcal y proteína se calculan con tu peso, altura, edad y objetivo. Todo se guarda en este dispositivo.</p>
   </div>
   <div class="sheet-bg" id="loadBg"></div>
@@ -1016,6 +1031,11 @@
   <div class="toast" id="toast">Guardado</div>
 </div>
 
+<div class="update-bar" id="updateBar">
+  <div class="up-txt"><b>Nueva versión disponible</b><span>Pulsa para actualizar, tarda un segundo</span></div>
+  <button class="up-btn" id="updateBtn">Actualizar</button>
+  <button class="up-x" id="updateLater" aria-label="Más tarde">✕</button>
+</div>
 <div class="sheet-bg" id="exswBg"></div>
 <div class="sheet" id="exswSheet">
 <div class="grab"></div>
@@ -1716,6 +1736,7 @@
      false = se puede entrar como invitado con la versión gratuita */
   const REQUIRE_ACCOUNT = true;
 
+  const APP_VERSION='v17';   // súbela en cada publicación, junto a la de sw.js
   const KEY='fds-store-v1';
   const OLD_KEYS=['mamadofit-store-v1','recomp-store-v3'];   // migración desde nombres anteriores
   let S={profile:{weight:null,height:null,age:null,sex:'m',goal:'recomp',intens:'normal'},days:{}};
@@ -3190,6 +3211,11 @@
     document.getElementById('pAge').value=S.profile.age??''; document.querySelectorAll('#pGoal button').forEach(b=>b.classList.toggle('on',b.dataset.g===S.profile.goal));
     document.querySelectorAll('#pSex button').forEach(b=>b.classList.toggle('on',b.dataset.s===S.profile.sex));
     document.querySelectorAll('#pInt button').forEach(b=>b.classList.toggle('on',b.dataset.i===S.profile.intens));
+    const av=document.getElementById('appVer'); if(av) av.textContent=APP_VERSION;
+    const vs=document.getElementById('verState');
+    if(vs){ const pend=document.getElementById('updateBar').classList.contains('show');
+      vs.textContent = pend ? 'hay una actualización lista' : 'estás al día';
+      vs.style.color = pend ? 'var(--gold)' : 'var(--done)'; }
     const dz=document.getElementById('pDias');
     if(dz){ const sel=diasEntreno(); dz.innerHTML='';
       [1,2,3,4,5,6,0].forEach(d=>{ const b=document.createElement('button');
@@ -3298,11 +3324,58 @@
 })();
 </script>
 <script>
-if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+(function () {
+  if (!('serviceWorker' in navigator) || !location.protocol.startsWith('http')) return;
+  var esperando = null, recargando = false;
+
+  function avisar(sw) {
+    esperando = sw;
+    var bar = document.getElementById('updateBar');
+    if (bar) bar.classList.add('show');
+  }
+
   window.addEventListener('load', function () {
-    navigator.serviceWorker.register('sw.js').catch(function (e) { console.log('SW error', e); });
+    navigator.serviceWorker.register('sw.js').then(function (reg) {
+
+      // ya hay una versión nueva esperando de una visita anterior
+      if (reg.waiting && navigator.serviceWorker.controller) avisar(reg.waiting);
+
+      // aparece una versión nueva mientras la app está abierta
+      reg.addEventListener('updatefound', function () {
+        var nuevo = reg.installing;
+        if (!nuevo) return;
+        nuevo.addEventListener('statechange', function () {
+          if (nuevo.state === 'installed' && navigator.serviceWorker.controller) avisar(nuevo);
+        });
+      });
+
+      // buscar actualizaciones al volver a la app y cada media hora
+      document.addEventListener('visibilitychange', function () {
+        if (document.visibilityState === 'visible') reg.update().catch(function () {});
+      });
+      setInterval(function () { reg.update().catch(function () {}); }, 1800000);
+
+    }).catch(function (e) { console.log('SW error', e); });
+
+    var btn = document.getElementById('updateBtn');
+    if (btn) btn.addEventListener('click', function () {
+      btn.textContent = 'Actualizando…';
+      if (esperando) esperando.postMessage({ type: 'SKIP_WAITING' });
+      setTimeout(function () { if (!recargando) { recargando = true; location.reload(); } }, 1200);
+    });
+    var x = document.getElementById('updateLater');
+    if (x) x.addEventListener('click', function () {
+      document.getElementById('updateBar').classList.remove('show');
+    });
   });
-}
+
+  // cuando el nuevo service worker toma el control, recargamos una sola vez
+  navigator.serviceWorker.addEventListener('controllerchange', function () {
+    if (recargando) return;
+    recargando = true;
+    location.reload();
+  });
+})();
 </script>
 </body>
 </html>
