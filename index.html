@@ -2201,6 +2201,16 @@
   function startSession(){
     const w=wkEfectivo(todayKey());
     session=buildSession(w); sIdx=0; sPaused=false;
+    // Reanudar: saltar a la primera serie del primer ejercicio sin marcar
+    const rec=today();
+    const pendiente=rec.ex.findIndex(v=>!v);
+    if(pendiente>0){
+      const i=session.findIndex(p=>p.kind==='work'&&p.ei===pendiente);
+      if(i>0) sIdx=i;
+    } else if(pendiente<0){
+      // todo marcado: empezar de nuevo desde el principio
+      sIdx=0;
+    }
     try{ if(!audioCtx) audioCtx=new (window.AudioContext||window.webkitAudioContext)(); if(audioCtx.state==='suspended') audioCtx.resume(); }catch(e){}
     document.getElementById('player').classList.add('open');
     keepAwake().then(ok=>{ const ind=document.getElementById('awakeInd');
