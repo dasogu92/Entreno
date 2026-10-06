@@ -706,6 +706,17 @@
     padding:9px 15px;border-radius:9px;flex-shrink:0;}
   .up-btn:active{transform:scale(.95);}
   .up-x{background:none;border:none;color:rgba(14,16,18,.5);font-size:14px;padding:4px;flex-shrink:0;}
+
+  /* ====== TANDAS CORTAS ====== */
+  .tandas-t{font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);
+    margin:16px 0 9px;}
+  .tandas{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+  .tanda{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:10px 11px;
+    text-align:left;color:var(--text);font-size:12.5px;line-height:1.25;}
+  .tanda b{font-family:'JetBrains Mono';font-weight:800;color:var(--gold);}
+  .tanda span{display:block;font-size:10.5px;color:var(--muted2);margin-top:3px;}
+  .tanda:active{transform:scale(.96);border-color:var(--gold);}
+  .burn-opt .q{font-size:20px;}
 </style>
 </head>
 <body>
@@ -1696,13 +1707,20 @@
     {ic:'🍦',lb:'Helado / postre',kcal:250},
     {ic:'🍿',lb:'Snacks / picoteo',kcal:250}
   ];
+  // Formas realistas de compensar. Las de tiempo son las únicas capaces de
+  // cubrir un exceso entero; las tandas sirven para ir sumando a ratos.
   const BURN=[
-    {id:'andar',lab:'min andando rápido',per:5,chunk:10},
-    {id:'bici',lab:'min en bici',per:8,chunk:10},
-    {id:'correr',lab:'min corriendo',per:11,chunk:5},
-    {id:'comba',lab:'min de comba',per:10,chunk:5},
-    {id:'burp',lab:'burpees',per:0.5,chunk:15},
-    {id:'flex',lab:'flexiones',per:0.4,chunk:20}
+    {id:'andar', lab:'andando rápido', per:5.5, min:true, chunk:10, max:75},
+    {id:'bici',  lab:'en bici suave',  per:7,   min:true, chunk:10, max:60},
+    {id:'correr',lab:'corriendo flojo',per:10,  min:true, chunk:5,  max:45},
+    {id:'comba', lab:'de comba',       per:11,  min:true, chunk:5,  max:30}
+  ];
+  // Tandas cortas para sumar sin agobios (no pretenden cubrir el total)
+  const TANDAS=[
+    {id:'burp', lab:'burpees',     per:0.5,  chunk:15},
+    {id:'sent', lab:'sentadillas', per:0.32, chunk:30},
+    {id:'flex', lab:'flexiones',   per:0.3,  chunk:20},
+    {id:'esca', lab:'escaleras (pisos)', per:4, chunk:5}
   ];
   // kcal/min aproximadas del entreno según intensidad
   function kcalPerMin(inten){ return inten>=5?9 : inten>=4?7 : inten>=3?6 : 3.5; }
@@ -1736,7 +1754,7 @@
      false = se puede entrar como invitado con la versión gratuita */
   const REQUIRE_ACCOUNT = true;
 
-  const APP_VERSION='v17';   // súbela en cada publicación, junto a la de sw.js
+  const APP_VERSION='v18';   // súbela en cada publicación, junto a la de sw.js
   const KEY='fds-store-v1';
   const OLD_KEYS=['mamadofit-store-v1','recomp-store-v3'];   // migración desde nombres anteriores
   let S={profile:{weight:null,height:null,age:null,sex:'m',goal:'recomp',intens:'normal'},days:{}};
@@ -2075,13 +2093,48 @@
         if(rec.burned>0) off.innerHTML='<span>Compensado a mano</span><b>−'+rec.burned+' kcal</b>'; }
       const opts=document.getElementById('burnOpts');opts.innerHTML='';
       if(!cleared){
-        const hint=document.createElement('p'); hint.className='note'; hint.style.marginTop='0'; hint.style.marginBottom='8px';
-        hint.textContent='Te quedan '+remain+' kcal. Elige cómo saldarlas (o marca más ejercicios del día para cubrirlas):';
+        // ¿se puede cubrir en un día con algo razonable?
+        const mejor=BURN.reduce((a,b)=> (remain/b.per) < (remain/a.per) ? b : a);
+        const minMejor=Math.ceil(remain/mejor.per);
+        const repartir = minMejor>45;                 // más de 45 min seguidos ya no es realista
+        const dias = repartir?Math.min(4,Math.ceil(minMejor/35)):1;
+        const porDia = Math.ceil(remain/dias);
+
+        const hint=document.createElement('p'); hint.className='note'; hint.style.marginTop='0'; hint.style.marginBottom='10px';
+        hint.innerHTML = repartir
+          ? 'Son <b>'+remain+' kcal</b>, demasiado para un solo día. Repártelo en <b>'+dias+' días</b> (unas '+porDia+' kcal al día) o déjalo compensar con tus entrenos de la semana.'
+          : 'Te quedan <b>'+remain+' kcal</b>. Con cualquiera de estas lo saldas hoy:';
         opts.appendChild(hint);
-        BURN.forEach(b=>{const q=Math.ceil(remain/b.per);const el=document.createElement('div');el.className='burn-opt';
-        el.innerHTML='<div class="info"><div class="q">'+q+' <span style="font-size:13px;font-weight:600;color:var(--muted)">'+b.lab+'</span></div><div class="lab">o suma tandas de '+b.chunk+' ('+Math.round(b.chunk*b.per)+' kcal)</div></div><button class="add">+'+b.chunk+'</button>';
-        el.querySelector('.add').addEventListener('click',()=>{rec.burned=Math.min(maxManual,rec.burned+b.chunk*b.per);save();renderCompensar();});
-        opts.appendChild(el);}); }
+
+        const objetivo = repartir?porDia:remain;
+        BURN.forEach(b=>{
+          const q=Math.ceil(objetivo/b.per);
+          if(q>b.max) return;                          // no proponemos lo inalcanzable
+          const el=document.createElement('div');el.className='burn-opt';
+          el.innerHTML='<div class="info"><div class="q">'+q+' min <span style="font-size:13px;font-weight:600;color:var(--muted)">'+b.lab+'</span></div>'+
+            '<div class="lab">'+(repartir?'cada día durante '+dias+' días':'de una vez, o en dos ratos')+'</div></div>'+
+            '<button class="add">+'+b.chunk+' min</button>';
+          el.querySelector('.add').addEventListener('click',()=>{rec.burned=Math.min(maxManual,rec.burned+b.chunk*b.per);save();renderCompensar();});
+          opts.appendChild(el);
+        });
+
+        // tandas cortas para ir picoteando
+        const tit=document.createElement('div'); tit.className='tandas-t'; tit.textContent='O ve sumando a ratos';
+        opts.appendChild(tit);
+        const wrap=document.createElement('div'); wrap.className='tandas';
+        TANDAS.forEach(t=>{
+          const kc=Math.round(t.chunk*t.per);
+          const b=document.createElement('button'); b.className='tanda';
+          b.innerHTML='<b>'+t.chunk+'</b> '+t.lab+'<span>+'+kc+' kcal</span>';
+          b.addEventListener('click',()=>{vibe(12);rec.burned=Math.min(maxManual,rec.burned+kc);save();renderCompensar();});
+          wrap.appendChild(b);
+        });
+        opts.appendChild(wrap);
+
+        const nota=document.createElement('p'); nota.className='note';
+        nota.textContent='Una cerveza no se borra con flexiones: lo que cuenta es el balance de la semana. Esto es un empujón para moverte, no una penitencia.';
+        opts.appendChild(nota);
+      }
     }
     document.getElementById('resetBurn').onclick=()=>{rec.burned=0;save();renderCompensar();};
     renderElevation(); renderHeader();
