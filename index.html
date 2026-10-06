@@ -646,6 +646,52 @@
   /* la gráfica, ya en Progreso */
   #weekCard .elev{height:66px;margin-top:2px;}
   #weekCard .day-detail{border-top:1px solid var(--line);}
+
+  /* ====== COLORES DEL REPRODUCTOR: VERDE = ESFUERZO, NARANJA = DESCANSO ====== */
+  .player{background:#0c1408;}                      /* trabajando: verde muy oscuro */
+  .player.rest{background:#16100c;}                 /* descanso: cálido */
+  .player.prep{background:#0e1012;}
+  .p-phase{color:var(--done);}
+  .player.rest .p-phase{color:var(--effort);}
+  .player.prep .p-phase{color:var(--gold);}
+  #pRingFill{stroke:var(--done);}
+  .player.rest #pRingFill{stroke:var(--effort);}
+  .player.prep #pRingFill{stroke:var(--gold);}
+  .p-reps{color:var(--done);}
+  .p-btn.main{background:var(--done);border-color:var(--done);}
+  .player.rest .p-btn.main{background:var(--effort);border-color:var(--effort);}
+  .p-progress i{background:var(--done);}
+  .player.rest .p-progress i{background:var(--effort);}
+
+  .p-info{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:9px;
+    font-size:11px;color:var(--muted);}
+  .p-info b{font-family:'JetBrains Mono';color:var(--text);font-weight:700;font-size:12.5px;}
+  .p-info .pi-pct{font-family:'Archivo';font-weight:800;color:var(--done);font-size:13px;}
+  .player.rest .p-info .pi-pct{color:var(--effort);}
+
+  /* ====== DÍAS DE ENTRENO ====== */
+  .dias{display:flex;gap:6px;}
+  .dias .dia{flex:1;aspect-ratio:1/1;max-height:44px;border-radius:10px;border:1px solid var(--line);
+    background:var(--panel2);color:var(--muted);font-family:'Archivo';font-weight:800;font-size:14px;padding:0;}
+  .dias .dia.on{background:linear-gradient(135deg,#ff8a1f,#ff3d00);border-color:var(--effort);color:var(--ink);}
+  .dias .dia:active{transform:scale(.92);}
+
+  /* ====== CAMBIAR EJERCICIO ====== */
+  .exsw-btn{width:30px;height:30px;border-radius:9px;border:1px solid var(--line2);background:var(--panel2);
+    color:var(--muted2);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-left:4px;}
+  .exsw-btn svg{width:13px;height:13px;}
+  .exsw-btn:active{transform:scale(.9);background:var(--sky);color:var(--ink);border-color:var(--sky);}
+  .swapopt.exsw{display:flex;align-items:center;gap:12px;}
+  .exsw-img{width:46px;height:46px;border-radius:10px;overflow:hidden;flex-shrink:0;background:#f3f4ef;position:relative;}
+  .exsw-img.vacia{background:var(--panel3);border:1px dashed var(--line2);}
+  .exsw-tx{flex:1;min-width:0;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+  #exswBg{z-index:64;} #exswSheet{z-index:65;}
+
+  /* ====== QUITAR AMIGO ====== */
+  .soc-del{width:24px;height:24px;border-radius:50%;border:1px solid var(--line2);background:transparent;
+    color:var(--muted2);display:flex;align-items:center;justify-content:center;flex-shrink:0;padding:0;margin-left:2px;}
+  .soc-del svg{width:11px;height:11px;}
+  .soc-del:active{background:var(--effort);color:var(--ink);border-color:var(--effort);}
 </style>
 </head>
 <body>
@@ -872,6 +918,9 @@
       <input type="text" id="pNick" placeholder="Cómo te verán" maxlength="18"></div>
     <div class="field"><label>Sexo</label><div class="seg" id="pSex"><button data-s="m" class="on">Hombre</button><button data-s="f">Mujer</button></div></div>
     <div class="field"><label>Objetivo</label><div class="seg" id="pGoal"><button data-g="recomp" class="on">Recomp</button><button data-g="cut">Definir</button><button data-g="maintain">Mantener</button></div></div>
+    <div class="field"><label>Días que entrenas</label>
+      <div class="dias" id="pDias"></div>
+      <p class="note" style="margin-top:8px;">Los días que no marques aparecerán como día libre, con una sesión suave de movilidad.</p></div>
     <div class="field"><label>Intensidad del entreno</label><div class="seg" id="pInt"><button data-i="soft">Suave</button><button data-i="normal" class="on">Normal</button><button data-i="hard">Intenso</button></div>
       <p class="note" id="intNote" style="margin-top:8px;">Normal: el plan tal cual. Suave baja series y sube descansos; Intenso añade series y recorta descansos.</p></div>
     <button class="save-profile" id="saveProfile">Guardar perfil</button>
@@ -967,6 +1016,15 @@
   <div class="toast" id="toast">Guardado</div>
 </div>
 
+<div class="sheet-bg" id="exswBg"></div>
+<div class="sheet" id="exswSheet">
+<div class="grab"></div>
+<h3 id="exswTitle">Cambiar ejercicio</h3>
+<p class="lede" id="exswLede">Elige otro que trabaje lo mismo.</p>
+<div id="exswList"></div>
+<button class="btn-sec" id="exswReset" style="width:100%;margin-top:6px;">Volver al original</button>
+<button class="danger" id="exswClose">Cerrar</button>
+</div>
 <div class="sheet-bg" id="demoBg"></div>
 <div class="sheet" id="demoSheet">
 <div class="grab"></div>
@@ -1058,6 +1116,7 @@
       <div class="big">¡HECHO!</div><p id="pDoneMsg">Entrenamiento completado.</p>
     </div>
   </div>
+  <div class="p-info" id="pInfo"></div>
   <div class="p-progress"><i id="pProgress" style="width:0%"></i></div>
   <div class="p-ctrls" id="pCtrls" style="margin-top:18px;">
     <button class="p-btn" id="pPause"><svg viewBox="0 0 24 24"><path d="M6 4h4v16H6zM14 4h4v16h-4z"/></svg><span>Pausa</span></button>
@@ -1286,6 +1345,49 @@
 
   // Variante determinista por semana del año: misma semana => mismo entreno.
   function weekNo(d){ const t=new Date(d.getFullYear(),d.getMonth(),d.getDate()); const s=new Date(t.getFullYear(),0,1); return Math.floor(((t-s)/86400000 + s.getDay())/7); }
+  /* ===== GRUPOS MUSCULARES Y ALTERNATIVAS ===== */
+  function grupoDe(nm){
+    const n=nm.toLowerCase();
+    if(/calentamiento|movilidad|estiramiento|yoga|saludo|guerrero|postura|relaj|respir|gato|psoas|apertura de pecho con banda/.test(n)) return 'movilidad';
+    if(/plancha|core|crunch|dead ?bug|bicho|russian|hollow|abdominal|superman|elevación de piernas|twist/.test(n)) return 'core';
+    if(/comba|burpee|mountain|escalador|skipping|carrera|bici|andar|paseo|marcha|trote|series|salto|vuelta a la calma|tramo/.test(n)) return 'cardio';
+    if(/curl/.test(n)) return 'biceps';
+    if(/tríceps|triceps|patada|fondos/.test(n)) return 'triceps';
+    if(/remo|pull-over|face pull|encogimiento|buenos días/.test(n)) return 'espalda';
+    if(/elevaciones laterales|elevación frontal|pájaro|press militar|arnold|press de hombro/.test(n)) return 'hombro';
+    if(/press banca|press inclinado|apertura|flexion|flexión/.test(n)) return 'pecho';
+    if(/sentadilla|zancada|peso muerto|step-up|búlgara|gemelo|glúteo|femoral|thruster|swing|pierna/.test(n)) return 'pierna';
+    return 'otro';
+  }
+  const GRUPO_NOMBRE={pecho:'Pecho',hombro:'Hombro',triceps:'Tríceps',espalda:'Espalda',biceps:'Bíceps',
+    pierna:'Pierna',core:'Core',cardio:'Cardio',movilidad:'Movilidad',otro:'Otros'};
+  // catálogo de todos los ejercicios del plan, agrupados
+  let POOL_EJ=null;
+  function poolEjercicios(){
+    if(POOL_EJ) return POOL_EJ;
+    const vistos={}; POOL_EJ={};
+    WORKOUTS.forEach(d=>d.variants.forEach(v=>v.ex.forEach(e=>{
+      if(vistos[e.nm]) return; vistos[e.nm]=1;
+      const g=grupoDe(e.nm);
+      (POOL_EJ[g]=POOL_EJ[g]||[]).push(e.nm);
+    })));
+    Object.keys(POOL_EJ).forEach(g=>POOL_EJ[g].sort((a,b)=>a.localeCompare(b,'es')));
+    return POOL_EJ;
+  }
+  function alternativas(nm){
+    const g=grupoDe(nm);
+    return (poolEjercicios()[g]||[]).filter(x=>x!==nm);
+  }
+
+  /* ===== DÍAS DE ENTRENAMIENTO ===== */
+  const DIA_LETRA=['D','L','M','X','J','V','S'];
+  const DIA_NOMBRE=['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+  function diasEntreno(){
+    const d=S.profile&&S.profile.dias;
+    return (Array.isArray(d)&&d.length)?d:[1,2,3,4,5,6,0];   // por defecto, todos
+  }
+  function esDiaEntreno(dow){ return diasEntreno().indexOf(dow)>=0; }
+
   // Escalado según la intensidad elegida en el perfil
   const INTENS={ soft:{sets:-1,vol:0.75,rest:1.3,lbl:'Suave'}, normal:{sets:0,vol:1,rest:1,lbl:'Normal'}, hard:{sets:1,vol:1.2,rest:0.75,lbl:'Intenso'} };
   function scaleEx(ex,cfg){
@@ -1307,14 +1409,31 @@
     const v=W.variants[vi]||W.variants[0];
     const lvl=(rec&&rec.wi)||(S.profile&&S.profile.intens)||'normal';
     const cfg=INTENS[lvl]||INTENS.normal;
-    const ex=v.ex.map(e=>scaleEx(e,cfg));
+    let ex=v.ex.map(e=>scaleEx(e,cfg));
+    // ejercicios cambiados uno a uno
+    const cambios=(rec&&rec.exSwap)||{};
+    let algunCambio=false;
+    ex=ex.map(e=>{ if(cambios[e.nm]){ algunCambio=true; return Object.assign({},e,{nm:cambios[e.nm],orig:e.nm}); } return e; });
     const inten=Math.max(1,Math.min(5, W.intensity + (cfg.sets>0?1:(cfg.sets<0?-1:0))));
-    return {day:day, vi:vi, tag:W.tag, intensity:inten, baseIntensity:W.intensity, title:v.title, ex:ex,
-            nv:W.variants.length, ilbl:cfg.lbl, lvl:lvl, swapped:swapped, dayIntens:!!(rec&&rec.wi)}; }
+    const descanso = !swapped && !esDiaEntreno(day);   // día libre según tu perfil
+    return {day:day, vi:vi, tag:W.tag, intensity:descanso?1:inten, baseIntensity:W.intensity,
+            title:descanso?('Día libre · '+v.title.split('—')[0].trim()):v.title, ex:ex,
+            nv:W.variants.length, ilbl:cfg.lbl, lvl:lvl, swapped:swapped, exSwapped:algunCambio,
+            libre:descanso, dayIntens:!!(rec&&rec.wi)}; }
   // duración estimada de cualquier variante con una intensidad dada (para el selector)
   function previewMin(dayIdx,vi,lvl){ const cfg=INTENS[lvl]||INTENS.normal;
     return estMinutes({ex:WORKOUTS[dayIdx].variants[vi].ex.map(e=>scaleEx(e,cfg))}); }
   function wkToday(){ return wkOf(todayKey()); }
+  // en un día libre se ofrece el descanso activo en lugar del entreno fuerte
+  function wkEfectivo(key){
+    const w=wkOf(key);
+    if(!w.libre) return w;
+    const rec=S.days&&S.days[key];
+    const cfg=INTENS[(rec&&rec.wi)||(S.profile&&S.profile.intens)||'normal']||INTENS.normal;
+    const W=WORKOUTS[0], vi=((weekNo(new Date(key+'T00:00:00'))%W.variants.length)+W.variants.length)%W.variants.length;
+    const v=W.variants[vi];
+    return Object.assign({},w,{tag:'Día libre',title:v.title,ex:v.ex.map(e=>scaleEx(e,cfg)),intensity:1});
+  }
 
   /* ===== MEALS con ingredientes ===== */
   // Catálogo de comidas. Los 7 primeros de cada tipo son el menú por defecto (uno por día);
@@ -1607,7 +1726,7 @@
   function dow(){return new Date().getDay();}
   function blankDay(wk){return {w:wk.day,v:wk.vi,ex:new Array(wk.ex.length).fill(false),meals:[false,false,false,false],drinks:[],extras:[],burned:0,weight:null};}
   // dayRec ahora deriva el entreno (y su variante) de la propia fecha
-  function dayRec(k){ const wk=wkOf(k); if(!S.days[k]) S.days[k]=blankDay(wk); const r=S.days[k];
+  function dayRec(k){ const wk=wkEfectivo(k); if(!S.days[k]) S.days[k]=blankDay(wk); const r=S.days[k];
     r.w=wk.day; r.v=wk.vi;
     if(!Array.isArray(r.ex)||r.ex.length!==wk.ex.length) r.ex=new Array(wk.ex.length).fill(false);
     if(!r.extras) r.extras=[]; if(!r.drinks) r.drinks=[]; if(!r.pick) r.pick=[null,null,null,null]; return r; }
@@ -1701,7 +1820,7 @@
   // Anillos de HOY en la cabecera (siempre el día actual)
   function renderTodayRings(){
     const box=document.getElementById('todayRings'); if(!box) return;
-    const key=todayKey(), wk=wkOf(key), r=S.days&&S.days[key];
+    const key=todayKey(), wk=wkEfectivo(key), r=S.days&&S.days[key];
     const tw=document.getElementById('todayWk');
     if(tw) tw.textContent = wk.title.length>34 ? wk.title.slice(0,32)+'…' : wk.title;
     if(!r){ box.innerHTML=miniRing(0,'eff','0%','Entreno')+miniRing(0,'done','0/4','Comidas')+miniRing(0,'mut','—','Excesos'); return; }
@@ -1764,7 +1883,7 @@
   let wSel='today';
   function wKey(){ const d=new Date(); if(wSel==='tomorrow') d.setDate(d.getDate()+1); return keyOf(d); }
   function renderEntreno(){
-    const isT=(wSel==='tomorrow'), key=wKey(), w=wkOf(key), rec=dayRec(key);
+    const isT=(wSel==='tomorrow'), key=wKey(), w=wkEfectivo(key), rec=dayRec(key);
     document.querySelectorAll('#wSeg button').forEach(b=>b.classList.toggle('on',b.dataset.w===wSel));
     document.getElementById('workoutTag').innerHTML=w.tag+' · Var. '+'ABC'[w.vi]+' · '+w.ilbl+
       (w.swapped?' <span class="swapped">cambiado</span>':'')+(w.dayIntens?' <span class="swapped">solo hoy</span>':'');
@@ -1787,10 +1906,13 @@
       const demo = hasDemo(ex.nm);
       row.innerHTML=(isT?'<span class="dotmark"></span>':'<button class="chk" aria-label="Marcar"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></button>')+
         (demo?('<button class="exthumb" aria-label="Ver cómo se hace">'+demoFrames(ex.nm,'thumb')+'</button>'):'<span class="exthumb empty"></span>')+
-        '<div class="body"><div class="nm">'+ex.nm+'</div>'+(showLoad?('<div class="exload">'+loadChip(ex.nm)+'</div>'):'')+'</div><div class="sets">'+detail+'</div>';
+        '<div class="body"><div class="nm">'+ex.nm+(ex.orig?' <span class="swapped">cambiado</span>':'')+'</div>'+(showLoad?('<div class="exload">'+loadChip(ex.nm)+'</div>'):'')+'</div>'+
+        '<div class="sets">'+detail+'</div>'+
+        (isT?'':'<button class="exsw-btn" aria-label="Cambiar ejercicio"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 2l4 4-4 4"/><path d="M3 6h18"/><path d="M7 22l-4-4 4-4"/><path d="M21 18H3"/></svg></button>');
       if(!isT) row.querySelector('.chk').addEventListener('click',e=>{tap(e.currentTarget);rec.ex[i]=!rec.ex[i];save();renderEntreno();renderHeader();renderElevation();});
       const lb=row.querySelector('.loadbtn'); if(lb) lb.addEventListener('click',()=>{ vibe(12); if(requirePro('Registro de cargas')) openLoad(ex.nm); });
       const th=row.querySelector('.exthumb'); if(th&&demo) th.addEventListener('click',e=>{ e.stopPropagation(); openDemo(ex.nm); });
+      const sw=row.querySelector('.exsw-btn'); if(sw) sw.addEventListener('click',e=>{ e.stopPropagation(); vibe(12); openExSwap(key, ex.nm); });
       list.appendChild(row); });
     wireFallback(list);
   }
@@ -2077,7 +2199,7 @@
   });
 
   function startSession(){
-    const w=wkToday();
+    const w=wkEfectivo(todayKey());
     session=buildSession(w); sIdx=0; sPaused=false;
     try{ if(!audioCtx) audioCtx=new (window.AudioContext||window.webkitAudioContext)(); if(audioCtx.state==='suspended') audioCtx.resume(); }catch(e){}
     document.getElementById('player').classList.add('open');
@@ -2101,7 +2223,7 @@
     // step counter (nº de work sobre total works)
     const totalWorks=session.filter(x=>x.kind==='work').length;
     const doneWorks=session.slice(0,sIdx).filter(x=>x.kind==='work').length + (ph.kind==='work'?1:0);
-    document.getElementById('pStep').textContent = ph.kind==='work'?('Bloque '+doneWorks+'/'+totalWorks):'';
+    document.getElementById('pStep').textContent = ph.kind==='work'?('Serie '+doneWorks+' de '+totalWorks+' del entreno'):'';
     // ejercicio + centro
     if(ph.kind==='rest'){
       document.getElementById('pEx').textContent='Descanso';
@@ -2112,8 +2234,10 @@
     } else {
       document.getElementById('pEx').textContent=ph.name;
       const pl=lastLoad(ph.name);
+      const quedanSeries=ph.sets-ph.set;
       document.getElementById('pNext').innerHTML='Serie <b>'+ph.set+' / '+ph.sets+'</b>'+
-        (pl?(' &nbsp;·&nbsp; <span style="color:var(--sky)">última: '+pl.kg+' kg</span>'):'');
+        (quedanSeries>0?(' &nbsp;·&nbsp; quedan '+quedanSeries):' &nbsp;·&nbsp; <b>última</b>')+
+        (pl?(' &nbsp;·&nbsp; <span style="color:var(--sky)">'+pl.kg+' kg</span>'):'');
     }
     // animación siempre visible: del ejercicio actual, o del siguiente si estamos descansando
     const demoName = (ph.kind==='work')?ph.name:((ph.kind==='rest'||ph.kind==='prep')?ph.name:null);
@@ -2157,6 +2281,7 @@
     if(ph.kind!=='work'||ph.mode!=='reps'){ document.getElementById('pRingCenter').querySelector('.p-time')?.replaceChildren(document.createTextNode(mmss(Math.max(0,sRemain)))); }
     const frac=ph.dur?Math.max(0,sRemain)/ph.dur:0;
     document.getElementById('pRingFill').style.strokeDashoffset=P_CIRC*(1-frac);
+    if(sRemain%5===0) updateProgress();
     if(sRemain<=3&&sRemain>0){ beep(880,0.1); vibe(40); }
     if(sRemain<=0){ beep(1100,0.25); vibe([80,40,80]); advance(); }
   }
@@ -2169,7 +2294,32 @@
     sIdx++;
     enterPhase();
   }
-  function updateProgress(){ document.getElementById('pProgress').style.width=Math.round(sIdx/(session.length-1)*100)+'%'; }
+  // minutos que quedan sumando trabajo y descansos pendientes
+  function restanteMin(){
+    let s=0;
+    for(let i=sIdx;i<session.length;i++){
+      const ph=session[i]; if(ph.kind==='done') continue;
+      s += (i===sIdx? Math.max(0,sRemain) : (ph.dur||0));
+    }
+    return Math.max(1, Math.round(s/60));
+  }
+  function updateProgress(){
+    document.getElementById('pProgress').style.width=Math.round(sIdx/(session.length-1)*100)+'%';
+    const info=document.getElementById('pInfo'); if(!info) return;
+    const ph=session[sIdx]||{};
+    const w=wkEfectivo(todayKey());
+    const totalEj=w.ex.length;
+    // en qué ejercicio estamos
+    let ei = (ph.ei!=null)?ph.ei : (function(){ for(let i=sIdx;i<session.length;i++) if(session[i].ei!=null) return session[i].ei; return totalEj-1; })();
+    const totalSeries=session.filter(x=>x.kind==='work').length;
+    const seriesHechas=session.slice(0,sIdx).filter(x=>x.kind==='work').length;
+    const pct=Math.round(sIdx/(session.length-1)*100);
+    info.innerHTML=
+      '<span><b>'+(ei+1)+'</b>/'+totalEj+' ejercicios</span>'+
+      '<span><b>'+seriesHechas+'</b>/'+totalSeries+' series</span>'+
+      '<span><b>'+restanteMin()+'</b> min restantes</span>'+
+      '<span class="pi-pct">'+pct+'%</span>';
+  }
   function confetti(){
     const host=document.getElementById('pDone'); if(!host) return;
     const cols=['#ff5a1f','#c2e625','#f4b400','#48c9e6','#f3f4ef'];
@@ -2284,11 +2434,11 @@
   async function pushPerfilSocial(){
     if(!sb||!authSession) return;
     try{
-      await sb.from('profiles').upsert({
-        user_id:authSession.user.id, nick:miNick(), code:miCodigo(),
-        streak:streak(), today_done:entrenoHoy(), today_date:todayKey(),
-        week_workouts:entrenosSemana(), updated_at:new Date().toISOString()
-      });
+      const uid=authSession.user.id;
+      const fila={nick:miNick(), code:miCodigo(), streak:streak(), today_done:entrenoHoy(),
+                  today_date:todayKey(), week_workouts:entrenosSemana(), updated_at:new Date().toISOString()};
+      const {data:u}=await sb.from('profiles').update(fila).eq('user_id',uid).select('user_id');
+      if(!u||!u.length){ fila.user_id=uid; await sb.from('profiles').insert(fila); }
     }catch(e){}
   }
   async function cargarAmigos(){
@@ -2349,8 +2499,11 @@
         '<span class="soc-nick">'+p.nick+(p.yo?' <b>· tú</b>':'')+
           '<span class="soc-sub">'+p.week_workouts+' esta semana</span></span>'+
         '<span class="soc-streak">'+p.streak+'<span>días</span></span>'+
-        '<span class="soc-hoy '+(p.today_done?'ok':'no')+'">'+(p.today_done?'✓':'—')+'</span>';
-      if(!p.yo) row.addEventListener('dblclick',()=>{ if(confirm('¿Quitar a '+p.nick+' de tus amigos?')) quitarAmigo(p.id); });
+        '<span class="soc-hoy '+(p.today_done?'ok':'no')+'">'+(p.today_done?'✓':'—')+'</span>'+
+        (p.yo?'':'<button class="soc-del" aria-label="Quitar amigo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>');
+      const del=row.querySelector('.soc-del');
+      if(del) del.addEventListener('click',e=>{ e.stopPropagation(); vibe(12);
+        if(confirm('¿Quitar a '+p.nick+' de tus amigos?')) quitarAmigo(p.id); });
       box.appendChild(row);
     });
     const vacio=document.getElementById('socEmpty');
@@ -2535,7 +2688,10 @@
       out.style.display='none'; inn.style.display='block';
       document.getElementById('accEmail').textContent=authSession.user.email||'Sesión iniciada';
       const t=S._synced?new Date(S._synced):null;
-      document.getElementById('accSync').textContent = t ? ('Última sincronización: '+t.toLocaleString('es-ES',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})) : 'Sin sincronizar todavía';
+      const el=document.getElementById('accSync');
+      if(ultimoFallo){ el.textContent='⚠ No se pudo guardar: '+ultimoFallo; el.style.color='var(--gold)'; }
+      else { el.style.color='';
+        el.textContent = t ? ('Última sincronización: '+t.toLocaleString('es-ES',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})) : 'Sin sincronizar todavía'; }
     } else { inn.style.display='none'; out.style.display='block'; }
   }
 
@@ -2612,15 +2768,30 @@
     if(!sb||!authSession) return;
     clearTimeout(pushTimer); pushTimer=setTimeout(pushRemote,2500);
   }
+  let ultimoFallo='';
   async function pushRemote(){
-    if(!sb||!authSession||syncing) return;
-    syncing=true;
+    if(!sb||!authSession||syncing) return false;
+    syncing=true; let ok=false;
     try{
       const payload=JSON.parse(JSON.stringify(S)); delete payload._synced;
-      const {error}=await sb.from('user_data').upsert({user_id:authSession.user.id,data:payload,updated_at:new Date().toISOString()});
-      if(!error){ S._synced=Date.now(); writeStore(JSON.stringify(S)); renderAccount(); pushPerfilSocial(); }
-    }catch(e){ /* sin conexión: se reintenta en el próximo guardado */ }
-    syncing=false;
+      const uid=authSession.user.id, ahora=new Date().toISOString();
+      // Importante: actualizamos SOLO las columnas permitidas. Un upsert incluiría
+      // user_id y la base de datos lo rechaza por los permisos de seguridad.
+      const {data:upd,error:e1}=await sb.from('user_data')
+        .update({data:payload,updated_at:ahora}).eq('user_id',uid).select('user_id');
+      if(e1) throw e1;
+      if(!upd||!upd.length){
+        const {error:e2}=await sb.from('user_data').insert({user_id:uid,data:payload,updated_at:ahora});
+        if(e2) throw e2;
+      }
+      ok=true; ultimoFallo='';
+      S._synced=Date.now(); writeStore(JSON.stringify(S)); renderAccount(); pushPerfilSocial();
+    }catch(e){
+      ultimoFallo=(e&&e.message)||'sin conexión';
+      console.warn('No se pudo guardar en la nube:',ultimoFallo);
+      renderAccount();
+    }
+    syncing=false; return ok;
   }
 
   // Descarga lo remoto y se queda con la versión más reciente
@@ -2773,6 +2944,44 @@
   // Si el evento nativo no llega (iOS, Firefox, Samsung…), mostramos la barra igualmente:
   // el botón abrirá entonces las instrucciones guiadas de esa plataforma.
   setTimeout(()=>{ if(!isInstalled()) showInstallUI(); }, 1500);
+
+  /* ===== CAMBIAR UN EJERCICIO SUELTO ===== */
+  let exswKey=null, exswOrig=null;
+  function openExSwap(key, nombreActual){
+    const rec=S.days&&S.days[key];
+    // si ya estaba cambiado, el original es el que guardamos
+    let orig=nombreActual;
+    if(rec&&rec.exSwap) Object.keys(rec.exSwap).forEach(o=>{ if(rec.exSwap[o]===nombreActual) orig=o; });
+    exswKey=key; exswOrig=orig;
+    const g=grupoDe(orig);
+    document.getElementById('exswTitle').textContent=nombreActual;
+    document.getElementById('exswLede').textContent='Alternativas de '+(GRUPO_NOMBRE[g]||'este grupo')+'. Se mantienen las mismas series y repeticiones.';
+    const box=document.getElementById('exswList'); box.innerHTML='';
+    const opts=[orig].concat(alternativas(orig));
+    opts.forEach(nm=>{
+      const el=document.createElement('button');
+      el.className='swapopt exsw'+(nm===nombreActual?' sel':'');
+      el.innerHTML=(hasDemo(nm)?('<span class="exsw-img">'+demoFrames(nm,'thumb')+'</span>'):'<span class="exsw-img vacia"></span>')+
+        '<span class="exsw-tx"><span class="so-n">'+nm+'</span>'+(nm===orig?'<span class="so-def">original</span>':'')+'</span>';
+      el.addEventListener('click',()=>{ vibe(12);
+        const r=dayRec(exswKey); r.exSwap=r.exSwap||{};
+        if(nm===exswOrig) delete r.exSwap[exswOrig]; else r.exSwap[exswOrig]=nm;
+        save(); closeExSwap(); renderEntreno(); toast(nm===exswOrig?'Ejercicio restaurado':'Ejercicio cambiado');
+      });
+      box.appendChild(el);
+    });
+    wireFallback(box);
+    document.getElementById('exswBg').classList.add('open');
+    document.getElementById('exswSheet').classList.add('open');
+  }
+  function closeExSwap(){ document.getElementById('exswBg').classList.remove('open'); document.getElementById('exswSheet').classList.remove('open'); }
+  document.getElementById('exswBg').addEventListener('click',closeExSwap);
+  document.getElementById('exswClose').addEventListener('click',closeExSwap);
+  document.getElementById('exswReset').addEventListener('click',()=>{
+    if(!exswKey) return; const r=dayRec(exswKey);
+    if(r.exSwap) delete r.exSwap[exswOrig];
+    save(); closeExSwap(); renderEntreno(); toast('Ejercicio restaurado');
+  });
 
   /* ===== VISOR DE EJERCICIO ===== */
   function hasDemo(nm){ return !!EXDEMO[nm]; }
@@ -2971,6 +3180,13 @@
     document.getElementById('pAge').value=S.profile.age??''; document.querySelectorAll('#pGoal button').forEach(b=>b.classList.toggle('on',b.dataset.g===S.profile.goal));
     document.querySelectorAll('#pSex button').forEach(b=>b.classList.toggle('on',b.dataset.s===S.profile.sex));
     document.querySelectorAll('#pInt button').forEach(b=>b.classList.toggle('on',b.dataset.i===S.profile.intens));
+    const dz=document.getElementById('pDias');
+    if(dz){ const sel=diasEntreno(); dz.innerHTML='';
+      [1,2,3,4,5,6,0].forEach(d=>{ const b=document.createElement('button');
+        b.type='button'; b.className='dia'+(sel.indexOf(d)>=0?' on':''); b.dataset.d=d; b.textContent=DIA_LETRA[d];
+        b.title=DIA_NOMBRE[d];
+        b.addEventListener('click',()=>{ vibe(10); b.classList.toggle('on'); });
+        dz.appendChild(b); }); }
     const nf=document.getElementById('nickField');
     if(nf){ nf.style.display = (CLOUD_ON&&authSession)?'block':'none';
       document.getElementById('pNick').value=S._nick||''; 
@@ -2993,6 +3209,8 @@
     S.profile.intens=document.querySelector('#pInt button.on').dataset.i;
     const nk=(document.getElementById('pNick').value||'').trim();
     if(nk) S._nick=nk;
+    const marcados=Array.from(document.querySelectorAll('#pDias .dia.on')).map(b=>parseInt(b.dataset.d));
+    S.profile.dias = marcados.length?marcados:[1,2,3,4,5,6,0];
     save(); renderAll(); renderComida(); closeSheet(); toast('Perfil guardado');
     pushPerfilSocial(); renderSocial(); });
   document.getElementById('exportData').addEventListener('click',()=>{

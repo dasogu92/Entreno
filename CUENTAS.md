@@ -45,6 +45,11 @@ create policy "actualizar lo propio" on public.user_data for update using (auth.
 revoke update on public.user_data from authenticated;
 grant  update (data, updated_at) on public.user_data to authenticated;
 
+-- El WITH CHECK impide además que nadie reasigne una fila a otra cuenta
+drop policy if exists "actualizar lo propio" on public.user_data;
+create policy "actualizar lo propio" on public.user_data
+  for update using (auth.uid() = user_id) with check (auth.uid() = user_id);
+
 -- La tabla billing no lleva políticas a propósito: solo la escribe el servidor.
 ```
 
